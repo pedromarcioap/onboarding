@@ -3,6 +3,32 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## ⚙️ CONFIGURAÇÕES CENTRAIS DA SUA VPS & EVOLUTION API\nEdite as variáveis no nó **'Sanitizar Dados & Configurações da VPS'**:\n- **evolutionApiUrl:** Endereço da Evolution API na sua VPS (ex: `https://evolution.pedromarcio.site` ou `http://evolution-api:8080` ou `http://IP_DA_VPS:8080`)\n- **evolutionApiKey:** Sua `AUTHENTICATION_API_KEY` global definida no Coolify/Docker.",
+        "height": 180,
+        "width": 860,
+        "color": 7
+      },
+      "id": "sticky-central-config",
+      "name": "Sticky Note: Configurações da VPS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 80]
+    },
+    {
+      "parameters": {
+        "content": "## 1️⃣ FLUXO PRINCIPAL: CRIAÇÃO DE INSTÂNCIA & QR CODE EM TEMPO REAL\nRecebe os dados do formulário do portal web, cria a instância isolada na Evolution API v2 e devolve a imagem Base64 do QR Code oficial do WhatsApp.",
+        "height": 260,
+        "width": 1100,
+        "color": 7
+      },
+      "id": "sticky-main-flow",
+      "name": "Sticky Note: Onboarding QR Code",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 280]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "client-onboarding",
         "responseMode": "responseNode",
@@ -12,28 +38,28 @@
       "name": "Webhook: Iniciar Onboarding",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [220, 300]
+      "position": [240, 360]
     },
     {
       "parameters": {
-        "jsCode": "// 1. Sanitizar dados do cliente recebidos do portal web\nconst body = $input.first().json.body || $input.first().json;\n\nconst rawName = body.clientName || 'Novo Cliente';\nconst cleanSlug = 'coach-' + rawName\n  .toLowerCase()\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9]/g, '-')\n  .replace(/-+/g, '-')\n  .substring(0, 20);\n\nreturn {\n  clientSlug: cleanSlug,\n  clientName: rawName,\n  clientPhone: body.clientPhone || '',\n  calendarLink: body.calendarLink || '',\n  niche: body.niche || '',\n  createdAt: new Date().toISOString()\n};"
+        "jsCode": "// 1. Sanitizar dados do cliente recebidos do portal web\nconst body = $input.first().json.body || $input.first().json;\n\nconst rawName = body.clientName || 'Novo Cliente';\nconst cleanSlug = 'coach-' + rawName\n  .toLowerCase()\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9]/g, '-')\n  .replace(/-+/g, '-')\n  .substring(0, 20);\n\nreturn {\n  // ⚙️ DEFINA AS CONFIGURAÇÕES DA SUA EVOLUTION API AQUI:\n  evolutionApiUrl: 'http://SEU_IP_PUBLICO:8080', // Ex: https://evolution.pedromarcio.site ou http://evolution-api:8080\n  evolutionApiKey: 'SEU_EVOLUTION_APIKEY',       // Sua chave GLOBAL da Evolution API\n  \n  clientSlug: cleanSlug,\n  clientName: rawName,\n  clientPhone: body.clientPhone || '',\n  calendarLink: body.calendarLink || '',\n  niche: body.niche || '',\n  createdAt: new Date().toISOString()\n};"
       },
       "id": "code-sanitize-slug",
-      "name": "Sanitizar Dados & Gerar Slug",
+      "name": "Sanitizar Dados & Configurações da VPS",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 300]
+      "position": [460, 360]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://SEU_IP_PUBLICO:8080/instance/create",
+        "url": "={{ $json.evolutionApiUrl }}/instance/create",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "SEU_EVOLUTION_APIKEY"
+              "value": "={{ $json.evolutionApiKey }}"
             },
             {
               "name": "Content-Type",
@@ -70,18 +96,18 @@
       "name": "Evolution: Criar Instância",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [660, 300]
+      "position": [680, 360]
     },
     {
       "parameters": {
         "method": "GET",
-        "url": "=http://SEU_IP_PUBLICO:8080/instance/connect/{{ $('code-sanitize-slug').item.json.clientSlug }}",
+        "url": "={{ $('Sanitizar Dados & Configurações da VPS').item.json.evolutionApiUrl }}/instance/connect/{{ $('Sanitizar Dados & Configurações da VPS').item.json.clientSlug }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "SEU_EVOLUTION_APIKEY"
+              "value": "={{ $('Sanitizar Dados & Configurações da VPS').item.json.evolutionApiKey }}"
             }
           ]
         },
@@ -97,12 +123,12 @@
       "name": "Evolution: Obter QR Code Base64",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [880, 300]
+      "position": [900, 360]
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"success\": true,\n  \"instanceName\": \"{{ $('code-sanitize-slug').item.json.clientSlug }}\",\n  \"qrcode\": \"{{ $json.base64 || $json.code || '' }}\",\n  \"pairingCode\": \"{{ $json.pairingCode || '' }}\",\n  \"clientName\": \"{{ $('code-sanitize-slug').item.json.clientName }}\"\n}",
+        "responseBody": "={\n  \"success\": true,\n  \"instanceName\": \"{{ $('Sanitizar Dados & Configurações da VPS').item.json.clientSlug }}\",\n  \"qrcode\": \"{{ $json.qrcode?.base64 || $json.base64 || $json.instance?.qrcode?.base64 || $json.qrcode?.code || $json.code || '' }}\",\n  \"pairingCode\": \"{{ $json.pairingCode || $json.qrcode?.pairingCode || '' }}\",\n  \"clientName\": \"{{ $('Sanitizar Dados & Configurações da VPS').item.json.clientName }}\"\n}",
         "options": {
           "responseHeaders": {
             "entries": [
@@ -126,7 +152,20 @@
       "name": "Responder ao Navegador com QR Code",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1100, 300]
+      "position": [1120, 360]
+    },
+    {
+      "parameters": {
+        "content": "## 2️⃣ POLLING DE STATUS DA CONEXÃO DO WHATSAPP\nCheca periodicamente se o cliente concluiu a leitura do QR Code no aparelho e avisa o portal web para avançar para a Etapa 3 automaticamente.",
+        "height": 220,
+        "width": 860,
+        "color": 7
+      },
+      "id": "sticky-status-flow",
+      "name": "Sticky Note: Status Polling",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 560]
     },
     {
       "parameters": {
@@ -139,18 +178,18 @@
       "name": "Webhook: Checar Status Conexão",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [220, 500]
+      "position": [240, 640]
     },
     {
       "parameters": {
         "method": "GET",
-        "url": "=http://SEU_IP_PUBLICO:8080/instance/connectionState/{{ $json.query.instance }}",
+        "url": "={{ $('Sanitizar Dados & Configurações da VPS').item.json.evolutionApiUrl || 'http://SEU_IP_PUBLICO:8080' }}/instance/connectionState/{{ $json.query.instance }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "SEU_EVOLUTION_APIKEY"
+              "value": "={{ $('Sanitizar Dados & Configurações da VPS').item.json.evolutionApiKey || 'SEU_EVOLUTION_APIKEY' }}"
             }
           ]
         },
@@ -166,7 +205,7 @@
       "name": "Evolution: Verificar State",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [520, 500]
+      "position": [520, 640]
     },
     {
       "parameters": {
@@ -187,7 +226,20 @@
       "name": "Responder Status ao Portal",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [780, 500]
+      "position": [780, 640]
+    },
+    {
+      "parameters": {
+        "content": "## 3️⃣ SIMULADOR AO VIVO (CHAT SANDBOX)\nRecebe as mensagens testadas no simulador da Etapa 3 e responde utilizando o cérebro do assessor executivo configurado.",
+        "height": 220,
+        "width": 860,
+        "color": 7
+      },
+      "id": "sticky-chat-flow",
+      "name": "Sticky Note: Chat Simulator",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 800]
     },
     {
       "parameters": {
@@ -200,7 +252,7 @@
       "name": "Webhook: Chat Teste Live Sandbox",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [220, 700]
+      "position": [240, 880]
     },
     {
       "parameters": {
@@ -210,7 +262,7 @@
       "name": "Cérebro IA: Gerar Resposta Real",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [520, 700]
+      "position": [520, 880]
     },
     {
       "parameters": {
@@ -239,7 +291,20 @@
       "name": "Responder Chat ao Vivo para o Portal",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [780, 700]
+      "position": [780, 880]
+    },
+    {
+      "parameters": {
+        "content": "## 4️⃣ DISPARO DE TESTE REAL NO WHATSAPP FÍSICO DO CLIENTE\nEnvia uma mensagem de boas-vindas real via Evolution API para o número de WhatsApp informado pelo mentor.",
+        "height": 220,
+        "width": 860,
+        "color": 7
+      },
+      "id": "sticky-whatsapp-test",
+      "name": "Sticky Note: WhatsApp Physical Test",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 1040]
     },
     {
       "parameters": {
@@ -252,18 +317,18 @@
       "name": "Webhook: Disparo WhatsApp Real",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [220, 900]
+      "position": [240, 1120]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://SEU_IP_PUBLICO:8080/message/sendText/{{ $json.body.instanceName }}",
+        "url": "={{ $('Sanitizar Dados & Configurações da VPS').item.json.evolutionApiUrl || 'http://SEU_IP_PUBLICO:8080' }}/message/sendText/{{ $json.body.instanceName }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "apikey",
-              "value": "SEU_EVOLUTION_APIKEY"
+              "value": "={{ $('Sanitizar Dados & Configurações da VPS').item.json.evolutionApiKey || 'SEU_EVOLUTION_APIKEY' }}"
             },
             {
               "name": "Content-Type",
@@ -296,7 +361,7 @@
       "name": "Evolution: Disparar Mensagem no Celular",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [520, 900]
+      "position": [520, 1120]
     },
     {
       "parameters": {
@@ -325,7 +390,7 @@
       "name": "Responder Confirmação de Disparo",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [780, 900]
+      "position": [780, 1120]
     }
   ],
   "connections": {
@@ -333,14 +398,14 @@
       "main": [
         [
           {
-            "node": "Sanitizar Dados & Gerar Slug",
+            "node": "Sanitizar Dados & Configurações da VPS",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Sanitizar Dados & Gerar Slug": {
+    "Sanitizar Dados & Configurações da VPS": {
       "main": [
         [
           {

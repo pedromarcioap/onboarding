@@ -1224,6 +1224,9 @@
             2. URL do Webhook do n8n deste Cliente (Obrigatório)
           </label>
           <input type="url" id="gen-webhook-input" oninput="updateGeneratedLink()" placeholder="https://n8n.suaempresa.com/webhook/coach-alex-onboarding" class="form-input" style="font-size: 0.85rem; font-family: var(--font-mono);" />
+          <div id="gen-webhook-warning" class="hidden" style="margin-top: 0.4rem; padding: 0.5rem 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.75rem; line-height: 1.4;">
+            ⚠️ <strong>Link de Edição do n8n detectado!</strong> Você copiou a URL do navegador (<code>/workflow/...</code>). A URL correta é a do <strong>nó Webhook</strong> dentro do n8n (ex: <code>https://n8n.pedromarcio.site/webhook/client-onboarding</code>).
+          </div>
           <p class="form-help" id="t-modal-linkgen-help-webhook">A URL do nó "Webhook: Iniciar Onboarding" criado no n8n especificamente para este cliente.</p>
         </div>
 
@@ -1334,7 +1337,10 @@
         <label class="form-label" for="input-vps-webhook" id="t-modal-vps-lbl-webhook">
           URL Padrão do Webhook do seu n8n (Opcional):
         </label>
-        <input type="url" id="input-vps-webhook" placeholder="https://n8n.suaempresa.com/webhook/client-onboarding" class="form-input" style="font-size: 0.85rem; font-family: var(--font-mono);" />
+        <input type="url" id="input-vps-webhook" oninput="checkVpsWebhookInput()" placeholder="https://n8n.suaempresa.com/webhook/client-onboarding" class="form-input" style="font-size: 0.85rem; font-family: var(--font-mono);" />
+        <div id="vps-webhook-warning" class="hidden" style="margin-top: 0.4rem; padding: 0.5rem 0.75rem; border-radius: 6px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; font-size: 0.75rem; line-height: 1.4;">
+          ⚠️ <strong>Link de Edição do n8n detectado!</strong> Você copiou a URL do navegador (<code>/workflow/...</code>). A URL correta é a do <strong>nó Webhook</strong> dentro do n8n (ex: <code>https://n8n.pedromarcio.site/webhook/client-onboarding</code>).
+        </div>
         <p class="form-help" id="t-modal-vps-help-webhook">
           Deixe em branco para rodar no <strong>Modo Demonstração (Sandbox)</strong> imediato, ou insira a URL do seu n8n para gerar QR Codes reais da sua Evolution API.
         </p>
@@ -1421,6 +1427,15 @@
         step2Tag: "FASE 2 DE 3",
         qrWaiting: "AGUARDANDO LEITURA DO APARELHO...",
         qrSimulateBtn: "[ Simular Leitura do QR Code ]",
+        qrLoading: "Gerando QR Code Oficial na Evolution API...",
+        qrLoadingSub: "CRIANDO INSTÂNCIA DEDICADA NA SUA VPS",
+        qrErrorTitle: "Falha ao Obter QR Code Real",
+        qrErrorDesc: (url) => `O Webhook da VPS não retornou um QR Code válido da Evolution API. Verifique se o workflow está <strong>Ativo</strong> no n8n e se você utilizou a <strong>Production URL</strong> do Webhook e não o link do editor.`,
+        qrErrorRetryBtn: "Tentar Novamente",
+        qrErrorFixWebhookBtn: "Configurar Webhook",
+        qrSandboxNotice: "MODO DEMONSTRAÇÃO LOCAL",
+        qrSandboxNoticeDesc: "Nenhum Webhook conectado. Este QR Code é apenas visual para teste. Para conectar o WhatsApp real, configure a URL do seu n8n.",
+        webhookWorkflowError: "Atenção: Você colou o link de edição do n8n (/workflow/...). A URL correta é a Production URL do nó Webhook (ex: https://n8n.suaempresa.com/webhook/client-onboarding).",
         qrSuccessTitle: "WhatsApp Conectado!",
         qrSuccessSub: "SESSÃO CRIPTOGRAFADA ATIVA",
         vpsIndicatorSandbox: "[ MODO SANDBOX LOCAL ]",
@@ -1556,6 +1571,15 @@
         step2Tag: "PHASE 2 OF 3",
         qrWaiting: "AWAITING SMARTPHONE CAMERA SCAN...",
         qrSimulateBtn: "[ Simulate QR Code Scan ]",
+        qrLoading: "Generating Live QR Code from Evolution API...",
+        qrLoadingSub: "PROVISIONING DEDICATED INSTANCE ON VPS",
+        qrErrorTitle: "Failed to Fetch Live QR Code",
+        qrErrorDesc: (url) => `The VPS Webhook did not return a valid QR Code from Evolution API. Ensure the n8n workflow is <strong>Active</strong> and that you copied the <strong>Production URL</strong> from the Webhook node rather than the editor URL.`,
+        qrErrorRetryBtn: "Retry Connection",
+        qrErrorFixWebhookBtn: "Configure Webhook",
+        qrSandboxNotice: "LOCAL DEMO MODE",
+        qrSandboxNoticeDesc: "No Webhook connected. This QR Code is illustrative only. To pair actual WhatsApp, configure your n8n Webhook URL.",
+        webhookWorkflowError: "Warning: You pasted the n8n editor URL (/workflow/...). Please copy the Production Webhook URL from the Webhook node (e.g. https://n8n.yourcompany.com/webhook/client-onboarding).",
         qrSuccessTitle: "WhatsApp Connected!",
         qrSuccessSub: "ENCRYPTED SESSION ACTIVE",
         vpsIndicatorSandbox: "[ LOCAL SANDBOX MODE ]",
@@ -2080,46 +2104,123 @@
       updateChatGreeting();
 
       goToStep(2);
+      requestRealQrCodeFromVps();
+    }
 
+    async function requestRealQrCodeFromVps() {
       const t = I18N[currentLang];
+      const matrixWrapper = document.getElementById('qr-matrix-wrapper');
+      const vpsIndicator = document.getElementById('vps-mode-indicator');
+      const simulateBtn = document.getElementById('t-qr-simulate-btn');
 
-      if (vpsWebhookUrl && vpsWebhookUrl.startsWith('http')) {
-        document.getElementById('vps-mode-indicator').innerText = isClientDedicatedMode ? t.vpsIndicatorConnecting : t.vpsIndicatorConnectingGeneral;
-        document.getElementById('vps-mode-indicator').style.color = "var(--primary)";
-
-        try {
-          const resp = await fetch(vpsWebhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              clientName: clientConfig.name,
-              clientPhone: clientConfig.phone,
-              calendarLink: clientConfig.calendar,
-              niche: clientConfig.niche
-            })
-          });
-
-          const data = await resp.json();
-          if (data && data.qrcode) {
-            const matrixWrapper = document.getElementById('qr-matrix-wrapper');
-            const imgSrc = data.qrcode.startsWith('data:image') ? data.qrcode : `data:image/png;base64,${data.qrcode}`;
-            matrixWrapper.innerHTML = `<img src="${imgSrc}" alt="WhatsApp Live QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />`;
-            
-            clientConfig.instanceName = data.instanceName || 'coach-alex';
-            document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorActive(clientConfig.instanceName);
-            document.getElementById('vps-mode-indicator').style.color = "#10b981";
-
-            pollVpsConnectionStatus(clientConfig.instanceName);
-          }
-        } catch (err) {
-          console.warn("VPS Webhook not reachable, falling back to local sandbox:", err);
-          document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorOffline;
-          document.getElementById('vps-mode-indicator').style.color = "var(--secondary)";
-        }
-      } else {
-        document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorSandbox;
-        document.getElementById('vps-mode-indicator').style.color = "var(--secondary)";
+      // 1. If in Sandbox Demo Mode (no webhook configured)
+      if (!vpsWebhookUrl || !vpsWebhookUrl.startsWith('http')) {
+        vpsIndicator.innerText = t.vpsIndicatorSandbox;
+        vpsIndicator.style.color = "var(--secondary)";
+        matrixWrapper.innerHTML = `
+          <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <svg id="qr-matrix-svg" viewBox="0 0 100 100" fill="#120302" style="width: 100%; height: 100%;">
+              <path d="M10 10h30v30H10zm5 5v20h20V15zM60 10h30v30H60zm5 5v20h20V15zM10 60h30v30H10zm5 5v20h20V65zM20 20h10v10H20zM70 20h10v10H70zM20 70h10v10H20zM50 10h5v15h-5zm0 25h5v20h-5zm15 15h20v5H65zm0 15h10v20H65zm15 10h10v10H80zm-30 0h5v20h-5zm-5-15h15v5H45zm5 25h10v5H50z"/>
+            </svg>
+            <div style="position: absolute; bottom: 8px; left: 8px; right: 8px; background: rgba(18, 3, 2, 0.94); border: 1px solid var(--secondary); padding: 0.4rem 0.6rem; border-radius: 6px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+              <span class="mono" style="font-size: 0.68rem; color: var(--secondary); font-weight: 700; display: block;">${t.qrSandboxNotice}</span>
+              <span style="font-size: 0.65rem; color: var(--text-secondary); line-height: 1.25; display: block; margin-top: 2px;">${t.qrSandboxNoticeDesc}</span>
+            </div>
+          </div>
+        `;
+        if (simulateBtn) simulateBtn.style.display = "inline-block";
+        return;
       }
+
+      // Check if URL is accidentally an n8n workflow editor URL
+      if (vpsWebhookUrl.includes('/workflow/')) {
+        renderQrErrorState(t.webhookWorkflowError);
+        return;
+      }
+
+      // 2. Real VPS Webhook Mode: Show Loading State
+      vpsIndicator.innerText = isClientDedicatedMode ? t.vpsIndicatorConnecting : t.vpsIndicatorConnectingGeneral;
+      vpsIndicator.style.color = "var(--primary)";
+      if (simulateBtn) simulateBtn.style.display = "none";
+
+      matrixWrapper.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 1.5rem;">
+          <div class="pulse-dot" style="width: 16px; height: 16px; margin-bottom: 1rem;"></div>
+          <p class="brand-font" style="font-size: 0.95rem; color: #ffffff;">${t.qrLoading}</p>
+          <p class="mono" style="font-size: 0.7rem; color: var(--secondary); margin-top: 0.4rem;">${t.qrLoadingSub}</p>
+        </div>
+      `;
+
+      try {
+        const resp = await fetch(vpsWebhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientName: clientConfig.name,
+            clientPhone: clientConfig.phone,
+            calendarLink: clientConfig.calendar,
+            niche: clientConfig.niche
+          })
+        });
+
+        if (!resp.ok) {
+          throw new Error(`HTTP Error ${resp.status}: ${resp.statusText}`);
+        }
+
+        const data = await resp.json();
+        const rawQr = data.qrcode || data.base64 || (data.instance && data.instance.qrcode);
+
+        if (rawQr) {
+          const imgSrc = rawQr.startsWith('data:image') ? rawQr : `data:image/png;base64,${rawQr}`;
+          matrixWrapper.innerHTML = `<img src="${imgSrc}" alt="WhatsApp Live QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px; background: #ffffff; padding: 6px;" />`;
+          
+          clientConfig.instanceName = data.instanceName || (data.instance && data.instance.instanceName) || 'coach-alex';
+          vpsIndicator.innerText = t.vpsIndicatorActive(clientConfig.instanceName);
+          vpsIndicator.style.color = "#10b981";
+
+          pollVpsConnectionStatus(clientConfig.instanceName);
+        } else {
+          throw new Error("O Webhook respondeu, mas não retornou a imagem Base64 da Evolution API.");
+        }
+      } catch (err) {
+        console.error("Evolution API QR Fetch Error:", err);
+        renderQrErrorState(err.message || String(err));
+      }
+    }
+
+    function renderQrErrorState(detailMsg) {
+      const t = I18N[currentLang];
+      const matrixWrapper = document.getElementById('qr-matrix-wrapper');
+      const vpsIndicator = document.getElementById('vps-mode-indicator');
+      const simulateBtn = document.getElementById('t-qr-simulate-btn');
+
+      vpsIndicator.innerText = t.vpsIndicatorOffline;
+      vpsIndicator.style.color = "var(--secondary)";
+      if (simulateBtn) simulateBtn.style.display = "inline-block";
+
+      matrixWrapper.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 1.25rem;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 0.65rem; color: #ef4444;">
+            <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
+          </div>
+          <p class="brand-font" style="font-size: 0.95rem; color: #ffffff; margin-bottom: 0.25rem;">${t.qrErrorTitle}</p>
+          <div style="font-size: 0.72rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.85rem; max-height: 90px; overflow-y: auto;">
+            ${t.qrErrorDesc(escapeHtml(vpsWebhookUrl))}
+            <div style="margin-top: 0.35rem; color: #fca5a5; font-family: var(--font-mono); font-size: 0.68rem; word-break: break-all;">${escapeHtml(detailMsg)}</div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+            <button type="button" onclick="requestRealQrCodeFromVps()" class="btn-primary" style="font-size: 0.72rem; padding: 0.4rem 0.8rem;">
+              <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i>
+              <span>${t.qrErrorRetryBtn}</span>
+            </button>
+            <button type="button" onclick="openVpsModal()" class="btn-secondary" style="font-size: 0.72rem; padding: 0.4rem 0.8rem;">
+              <i data-lucide="settings" style="width: 12px; height: 12px;"></i>
+              <span>${t.qrErrorFixWebhookBtn}</span>
+            </button>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
     }
 
     async function pollVpsConnectionStatus(instanceName) {
@@ -2354,6 +2455,15 @@
       }
 
       const webhook = document.getElementById('gen-webhook-input').value.trim();
+      const warnBox = document.getElementById('gen-webhook-warning');
+      if (warnBox) {
+        if (webhook.includes('/workflow/')) {
+          warnBox.classList.remove('hidden');
+        } else {
+          warnBox.classList.add('hidden');
+        }
+      }
+
       const clientName = document.getElementById('gen-client-name').value.trim();
       const lang = document.getElementById('gen-client-lang').value;
 
@@ -2398,6 +2508,7 @@
     // Modal 2: VPS Guide Controls
     function openVpsModal() {
       document.getElementById('input-vps-webhook').value = vpsWebhookUrl;
+      checkVpsWebhookInput();
       document.getElementById('vps-modal').classList.remove('hidden');
     }
 
@@ -2405,9 +2516,25 @@
       document.getElementById('vps-modal').classList.add('hidden');
     }
 
+    function checkVpsWebhookInput() {
+      const val = document.getElementById('input-vps-webhook').value.trim();
+      const warn = document.getElementById('vps-webhook-warning');
+      if (warn) {
+        if (val.includes('/workflow/')) {
+          warn.classList.remove('hidden');
+        } else {
+          warn.classList.add('hidden');
+        }
+      }
+    }
+
     function saveVpsConfig() {
       const t = I18N[currentLang];
       const val = document.getElementById('input-vps-webhook').value.trim();
+      if (val.includes('/workflow/')) {
+        alert(t.webhookWorkflowError);
+        return;
+      }
       vpsWebhookUrl = val;
       localStorage.setItem('vps_onboarding_webhook', val);
       closeVpsModal();
