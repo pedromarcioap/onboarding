@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>odiretorcriativo | Portal de Ativação do Assessor Executivo de WhatsApp</title>
+
+  <!-- Favicon & Brand Icons -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <!-- Google Fonts: Roboto Slab (Headings) + Lato (Body) matching https://odiretorcriativo.hotmart.host/ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&family=Roboto+Slab:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-base: #120302;
+      --bg-surface: #1e0605;
+      --bg-card: #2c0403;
+      --primary: #F94713;
+      --primary-hover: #fa5825;
+      --secondary: #FBBC00;
+      --accent-glow: rgba(249, 71, 19, 0.18);
+      --text-primary: #fdf8f6;
+      --text-secondary: #d1b8b5;
+      --border: rgba(249, 71, 19, 0.15);
+      --border-accent: rgba(249, 71, 19, 0.35);
+      --font-heading: 'Roboto Slab', Georgia, serif;
+      --font-main: 'Lato', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    h1, h2, h3, h4, .section-title, .brand-font {
+      font-family: var(--font-heading);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      letter-spacing: 0.08em;
+    }
+
+    /* Ambient Mesh Floating Blobs */
+    .mesh-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .blob {
+      position: absolute;
+      filter: blur(130px);
+      border-radius: 50%;
+    }
+
+    .blob-1 {
+      top: -10%;
+      left: 15%;
+      width: 550px;
+      height: 550px;
+      background: rgba(249, 71, 19, 0.15);
+      animation: float 14s ease-in-out infinite alternate;
+    }
+
+    .blob-2 {
+      top: 35%;
+      right: -8%;
+      width: 650px;
+      height: 650px;
+      background: rgba(251, 188, 0, 0.09);
+      animation: float 18s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, 45px) scale(1.08); }
+    }
+
+    /* Top Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      background: rgba(18, 3, 2, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+      padding: 1.1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      background: rgba(251, 188, 0, 0.1);
+      border: 1px solid rgba(251, 188, 0, 0.3);
+      border-radius: 50px;
+      color: var(--secondary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* Header Action Buttons */
+    .director-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      color: var(--text-primary);
+      padding: 0.38rem 0.85rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .director-btn:hover {
+      border-color: var(--primary);
+      color: var(--secondary);
+      background: rgba(249, 71, 19, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .vps-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--secondary);
+      padding: 0.38rem 0.85rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .vps-btn:hover {
+      border-color: var(--secondary);
+      background: rgba(251, 188, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Language Switcher */
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.5rem;
+      border-radius: 50px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .lang-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0.18rem 0.45rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .lang-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .lang-btn.active {
+      color: #ffffff;
+      background: var(--primary);
+      box-shadow: 0 2px 8px rgba(249, 71, 19, 0.4);
+    }
+
+    .lang-divider {
+      color: rgba(249, 71, 19, 0.3);
+      font-size: 0.65rem;
+    }
+
+    /* Main Container */
+    .main-wrap {
+      position: relative;
+      z-index: 10;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 5rem 1.5rem;
+    }
+
+    /* Dedicated Client Banner */
+    #dedicated-client-banner {
+      background: rgba(251, 188, 0, 0.08);
+      border: 1px solid rgba(251, 188, 0, 0.25);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.82rem;
+    }
+
+    /* Hero Typography */
+    .hero-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      color: var(--text-primary);
+    }
+
+    h1 span.highlight {
+      background: linear-gradient(135deg, var(--text-primary) 30%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      color: var(--text-secondary);
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      max-width: 68ch;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* Stepper Tabs */
+    .stepper-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      padding: 0.5rem;
+      border-radius: 16px;
+      margin-bottom: 2.5rem;
+    }
+
+    .step-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.25s ease;
+      font-family: var(--font-heading);
+    }
+
+    .step-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .step-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(249, 71, 19, 0.35);
+    }
+
+    /* Content Cards */
+    .content-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s ease;
+    }
+
+    .content-card:hover {
+      border-color: var(--border-accent);
+    }
+
+    .card-top {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.35rem;
+    }
+
+    .card-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+
+    .step-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--secondary);
+      background: rgba(251, 188, 0, 0.1);
+      border: 1px solid rgba(251, 188, 0, 0.25);
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-family: var(--font-heading);
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.95rem 1.2rem;
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 16px rgba(249, 71, 19, 0.2);
+    }
+
+    .form-help {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.4rem;
+      font-weight: 300;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .content-card {
+        padding: 1.5rem;
+      }
+      nav {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+      .nav-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 0.9rem 1.8rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 16px rgba(249, 71, 19, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-heading);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      background: var(--primary-hover);
+      box-shadow: 0 6px 22px rgba(249, 71, 19, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--secondary);
+      padding: 0.85rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border: 1px solid rgba(251, 188, 0, 0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-family: var(--font-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(251, 188, 0, 0.1);
+      border-color: var(--secondary);
+    }
+
+    /* QR Code Display & Box */
+    .qr-container {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .qr-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .qr-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .qr-frame {
+      width: 250px;
+      height: 250px;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .qr-frame svg, .qr-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .qr-success-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(18, 3, 2, 0.95);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #10b981;
+      padding: 1.5rem;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .instructions-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+
+    .instructions-box h3 {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .instructions-list {
+      list-style: decimal inside;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      font-weight: 300;
+    }
+
+    .instructions-list strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .security-note {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      background: rgba(251, 188, 0, 0.05);
+      border: 1px solid rgba(251, 188, 0, 0.2);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Simulator Frame */
+    .simulator-device {
+      max-width: 440px;
+      margin: 0 auto;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    .simulator-header {
+      background: var(--bg-card);
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-body {
+      height: 340px;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      background: var(--bg-base);
+    }
+
+    .chat-bubble-bot {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      border-top-left-radius: 3px;
+      padding: 0.85rem 1rem;
+      max-width: 85%;
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .chat-bubble-user {
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 14px;
+      border-top-right-radius: 3px;
+      padding: 0.85rem 1rem;
+      max-width: 85%;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      align-self: flex-end;
+    }
+
+    .quick-prompts-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.65rem 1rem;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .quick-prompt-chip {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      color: var(--secondary);
+      font-size: 0.78rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-main);
+      font-weight: 600;
+    }
+
+    .quick-prompt-chip:hover {
+      background: var(--bg-card);
+      border-color: var(--secondary);
+    }
+
+    .chat-input-bar {
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input-field {
+      flex: 1;
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .chat-input-field:focus {
+      border-color: var(--primary);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 6, 4, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-accent);
+      border-radius: 20px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2.2rem;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .arch-step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--secondary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--primary);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mesh Gradient Background with Floating Warm Blobs -->
+  <div class="mesh-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="https://odiretorcriativo.hotmart.host/" target="_blank" class="nav-brand brand-font">
+      odiretorcriativo
+    </a>
+
+    <div class="nav-right">
+      <div class="badge-pill">
+        <span class="pulse-dot"></span>
+        <span id="t-nav-badge">ASSESSOR EXECUTIVO IA // WHATSAPP</span>
+      </div>
+
+      <!-- Director Link Generator Button (For Pedro) -->
+      <button type="button" onclick="openLinkGenModal()" class="director-btn" id="btn-director-link-gen">
+        <i data-lucide="link" style="width: 14px; height: 14px; color: var(--primary);"></i>
+        <span id="t-director-btn">GERAR LINK DE CLIENTE</span>
+      </button>
+
+      <!-- VPS Architecture Guide Button -->
+      <button type="button" onclick="openVpsModal()" class="vps-btn" id="t-vps-btn">
+        <i data-lucide="server" style="width: 14px; height: 14px; color: var(--secondary);"></i>
+        <span id="t-vps-btn-text">CONEXÃO VPS</span>
+      </button>
+
+      <!-- Language Selector -->
+      <div class="lang-switcher">
+        <button type="button" onclick="setLanguage('pt')" id="lang-btn-pt" class="lang-btn active" title="Português">
+          🇧🇷 PT
+        </button>
+        <span class="lang-divider">|</span>
+        <button type="button" onclick="setLanguage('en')" id="lang-btn-en" class="lang-btn" title="English">
+          🇺🇸 EN
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Experience -->
+  <main class="main-wrap">
+
+    <!-- Dedicated Client Active Banner (Visible when client opens specific link) -->
+    <div id="dedicated-client-banner" class="hidden">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span class="pulse-dot"></span>
+        <span style="color: var(--text-primary); font-weight: 700; font-family: var(--font-heading);" id="t-client-banner-title">
+          Ambiente de Onboarding Dedicado
+        </span>
+        <span class="mono" style="font-size: 0.72rem; color: var(--secondary); background: var(--bg-surface); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);" id="t-client-banner-badge">
+          WORKFLOW INDIVIDUAL VINCULADO
+        </span>
+      </div>
+      <span class="mono" style="font-size: 0.72rem; color: #10b981;" id="t-client-banner-active">● CONEXÃO PRIVADA ATIVA</span>
+    </div>
+
+    <!-- Hero Header -->
+    <header class="hero-header">
+      <div class="badge-pill" style="margin-bottom: 1.25rem;">
+        <i data-lucide="sparkles" style="width: 14px; height: 14px; color: var(--secondary);"></i>
+        <span id="t-hero-badge">SISTEMAS OPERACIONAIS VIVOS</span>
+      </div>
+
+      <h1 id="t-hero-title">
+        Ativação do seu <span class="highlight">Assessor Executivo</span>
+      </h1>
+
+      <p class="hero-desc" id="t-hero-desc">
+        Preencha suas diretrizes comerciais, conecte sua agenda e aponte a câmera do WhatsApp para o QR Code. Sua inteligência de vendas e agendamento estará ativa em menos de 60 segundos.
+      </p>
+    </header>
+
+    <!-- Stepper Navigation -->
+    <div class="stepper-nav">
+      <button onclick="goToStep(1)" id="tab-step-1" class="step-btn active">
+        <span>01.</span>
+        <span id="t-tab-1">SUAS DIRETRIZES</span>
+      </button>
+      <button onclick="goToStep(2)" id="tab-step-2" class="step-btn">
+        <span>02.</span>
+        <span id="t-tab-2">PAREAMENTO QR CODE</span>
+      </button>
+      <button onclick="goToStep(3)" id="tab-step-3" class="step-btn">
+        <span>03.</span>
+        <span id="t-tab-3">SANDBOX AO VIVO</span>
+      </button>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- STEP 1: Directives & Calendar Setup -->
+    <!-- ===================================================================== -->
+    <section id="pane-step-1" class="content-card">
+      <div class="card-top">
+        <div>
+          <h2 class="card-title" id="t-step1-title">1. Diretrizes da sua Marca & Agenda</h2>
+          <p class="card-subtitle" id="t-step1-subtitle">Estas informações moldam a voz, a postura e o link de agendamento que seu assessor enviará aos leads.</p>
+        </div>
+        <span class="step-tag" id="t-step1-tag">FASE 1 DE 3</span>
+      </div>
+
+      <form onsubmit="handleStep1Submit(event)">
+        <!-- Brand Name -->
+        <div class="form-group">
+          <label class="form-label" for="input-client-name" id="t-lbl-name">
+            Nome do Mentor ou Marca da Mentoria
+          </label>
+          <input type="text" id="input-client-name" required value="" placeholder="" class="form-input" />
+          <p class="form-help" id="t-help-name">Como o robô se apresentará na primeira mensagem ao lead.</p>
+        </div>
+
+        <div class="form-grid-2">
+          <!-- WhatsApp VIP -->
+          <div class="form-group">
+            <label class="form-label" for="input-client-phone" id="t-lbl-phone">
+              Seu WhatsApp Pessoal (Alertas VIP)
+            </label>
+            <input type="tel" id="input-client-phone" required value="" placeholder="" class="form-input" />
+            <p class="form-help" id="t-help-phone">Para onde o robô enviará notificações imediatas quando qualificar um lead de alta renda.</p>
+          </div>
+
+          <!-- Calendar URL -->
+          <div class="form-group">
+            <label class="form-label" for="input-client-calendar" id="t-lbl-calendar">
+              Link da sua Agenda (Google Calendar / Cal.com)
+            </label>
+            <input type="url" id="input-client-calendar" required value="" placeholder="" class="form-input" />
+            <p class="form-help" id="t-help-calendar">O robô enviará este link automaticamente no momento exato do fechamento da conversa.</p>
+          </div>
+        </div>
+
+        <!-- Mentorship Focus -->
+        <div class="form-group">
+          <label class="form-label" for="input-client-niche" id="t-lbl-niche">
+            Foco Principal ou Promessa Central da Mentoria
+          </label>
+          <input type="text" id="input-client-niche" value="" placeholder="" class="form-input" />
+          <p class="form-help" id="t-help-niche">O tema central que o assessor usará para demonstrar autoridade nas respostas.</p>
+        </div>
+
+        <!-- Action Bar -->
+        <div style="display: flex; justify-content: flex-end; padding-top: 1.5rem; border-top: 1px solid var(--border); margin-top: 2rem;">
+          <button type="submit" class="btn-primary" id="btn-submit-step1">
+            <span id="t-btn-step1">SALVAR & GERAR QR CODE</span>
+            <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- STEP 2: Instant WhatsApp QR Code Pairing -->
+    <!-- ===================================================================== -->
+    <section id="pane-step-2" class="content-card hidden">
+      <div class="card-top">
+        <div>
+          <h2 class="card-title" id="t-step2-title">2. Pareamento Instantâneo do WhatsApp</h2>
+          <p class="card-subtitle" id="t-step2-subtitle">Conecte o número de telefone que responderá seus leads em tempo real.</p>
+        </div>
+        <span class="step-tag" id="t-step2-tag">FASE 2 DE 3</span>
+      </div>
+
+      <div class="qr-container">
+        <!-- QR Code Display Box -->
+        <div class="qr-box">
+          <div class="qr-frame">
+            <!-- Authentic SVG QR Matrix (Default) or Live Image -->
+            <div id="qr-matrix-wrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+              <svg id="qr-matrix-svg" viewBox="0 0 100 100" fill="#120302">
+                <path d="M10 10h30v30H10zm5 5v20h20V15zM60 10h30v30H60zm5 5v20h20V15zM10 60h30v30H10zm5 5v20h20V65zM20 20h10v10H20zM70 20h10v10H70zM20 70h10v10H20zM50 10h5v15h-5zm0 25h5v20h-5zm15 15h20v5H65zm0 15h10v20H65zm15 10h10v10H80zm-30 0h5v20h-5zm-5-15h15v5H45zm5 25h10v5H50z"/>
+              </svg>
+            </div>
+
+            <!-- Success Overlay -->
+            <div id="qr-success-overlay" class="qr-success-overlay hidden">
+              <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; color: #10b981;">
+                <i data-lucide="check" style="width: 32px; height: 32px; stroke-width: 3;"></i>
+              </div>
+              <h4 style="color: #ffffff; font-size: 1.15rem; margin-bottom: 0.25rem;" id="t-qr-success-title">WhatsApp Conectado!</h4>
+              <p class="mono" style="font-size: 0.75rem; color: #6ee7b7;" id="t-qr-success-sub">SESSÃO CRIPTOGRAFADA ATIVA</p>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+            <span class="pulse-dot"></span>
+            <span class="mono" id="t-qr-waiting">AGUARDANDO LEITURA DO APARELHO...</span>
+          </div>
+
+          <!-- Connection Source Badge -->
+          <div id="vps-mode-indicator" class="mono" style="font-size: 0.7rem; color: var(--secondary); margin-bottom: 0.5rem;">
+            [ MODO SANDBOX LOCAL ]
+          </div>
+
+          <button type="button" onclick="simulateScanSuccess()" style="background: none; border: none; color: var(--secondary); font-size: 0.8rem; text-decoration: underline; cursor: pointer; margin-top: 0.2rem; font-family: var(--font-heading);" id="t-qr-simulate-btn">
+            [ Simular Leitura do QR Code ]
+          </button>
+        </div>
+
+        <!-- Instructions Panel -->
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div class="instructions-box">
+            <h3 class="brand-font" id="t-instr-header">
+              <i data-lucide="smartphone" style="width: 18px; height: 18px; color: var(--primary);"></i>
+              <span id="t-instr-title">Como Conectar no seu Celular:</span>
+            </h3>
+            <ol class="instructions-list">
+              <li id="t-instr-1">Abra o aplicativo do <strong>WhatsApp</strong> no seu celular.</li>
+              <li id="t-instr-2">Acesse <strong>Aparelhos Conectados</strong> (nos 3 pontinhos no Android ou em Configurações no iPhone).</li>
+              <li id="t-instr-3">Toque no botão <strong>Conectar um Aparelho</strong>.</li>
+              <li id="t-instr-4">Aponte a câmera para o QR Code ao lado.</li>
+            </ol>
+          </div>
+
+          <div class="security-note">
+            <p style="color: var(--secondary); font-weight: 700; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-heading);" id="t-sec-title">
+              <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> <span id="t-sec-title-text">PRIVACIDADE E CONTROLE TOTAL</span>
+            </p>
+            <p style="font-size: 0.82rem; line-height: 1.5; color: var(--text-secondary);" id="t-sec-desc">
+              Seu celular continua funcionando normalmente para uso pessoal. Você pode desconectar o assessor a qualquer momento direto pelo menu de Aparelhos Conectados do seu WhatsApp.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--border); margin-top: 2rem;">
+        <button type="button" onclick="goToStep(1)" class="btn-secondary" id="btn-back-step2">
+          <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+          <span id="t-btn-back-1">VOLTAR</span>
+        </button>
+        <button type="button" onclick="goToStep(3)" class="btn-primary" id="btn-submit-step2">
+          <span id="t-btn-step2">AVANÇAR PARA SANDBOX</span>
+          <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- STEP 3: Live Sandbox Simulator & Real Evolution API Test -->
+    <!-- ===================================================================== -->
+    <section id="pane-step-3" class="content-card hidden">
+      <div class="card-top">
+        <div>
+          <h2 class="card-title" id="t-step3-title">3. Teste ao Vivo no Simulador</h2>
+          <p class="card-subtitle" id="t-step3-subtitle">Experimente interagir como se fosse um lead para validar a postura, qualificação e agendamento.</p>
+        </div>
+        <span class="step-tag" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #10b981;" id="t-step3-tag">ASSESSOR ATIVO</span>
+      </div>
+
+      <!-- Real Evolution API Direct Testing Card -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.85rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: #10b981;">
+              <i data-lucide="zap" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div>
+              <h3 class="brand-font" style="font-size: 1.1rem; color: #ffffff;" id="t-real-test-title">Teste em Tempo Real via Evolution API</h3>
+              <p class="mono" style="font-size: 0.72rem; color: var(--secondary);" id="t-real-test-status">INSTÂNCIA CONECTADA NA SUA VPS</p>
+            </div>
+          </div>
+          <button type="button" onclick="sendRealWhatsAppTestMessage()" id="btn-send-whatsapp-test" class="btn-primary" style="font-size: 0.82rem; padding: 0.65rem 1.25rem;">
+            <i data-lucide="smartphone" style="width: 15px; height: 15px;"></i>
+            <span id="t-btn-real-whatsapp-test">Disparar Teste no meu WhatsApp</span>
+          </button>
+        </div>
+
+        <div id="real-test-feedback-box" class="hidden" style="padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 0.75rem;"></div>
+
+        <p style="font-size: 0.82rem; color: var(--text-secondary); font-weight: 300; line-height: 1.5;" id="t-real-test-desc">
+          O simulador abaixo envia mensagens diretamente para o cérebro do seu n8n e Evolution API na VPS. Você também pode disparar uma mensagem de teste diretamente para o seu aparelho físico no botão acima!
+        </p>
+      </div>
+
+      <!-- Smartphone Frame -->
+      <div class="simulator-device">
+        <!-- Header -->
+        <div class="simulator-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; color: #fff;">
+              IA
+            </div>
+            <div>
+              <p id="chat-brand-name" style="font-size: 0.85rem; font-weight: 700; color: #ffffff; font-family: var(--font-heading);"></p>
+              <p style="font-size: 0.72rem; color: #10b981; display: flex; align-items: center; gap: 0.3rem;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span> <span id="t-chat-online">online</span>
+              </p>
+            </div>
+          </div>
+          <span class="mono" style="font-size: 0.7rem; color: var(--secondary); background: rgba(251, 188, 0, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px;" id="t-chat-sandbox">SANDBOX</span>
+        </div>
+
+        <!-- Chat Stream -->
+        <div id="chat-stream" class="chat-body">
+          <div class="chat-bubble-bot" id="initial-bot-bubble">
+            <!-- Rendered dynamically by updateChatGreeting() -->
+          </div>
+        </div>
+
+        <!-- Quick Prompts -->
+        <div class="quick-prompts-bar">
+          <button type="button" onclick="triggerQuickPrompt('vip')" class="quick-prompt-chip" id="t-quick-vip">
+            👑 Lead VIP (Diretor R$ 28k)
+          </button>
+          <button type="button" onclick="triggerQuickPrompt('method')" class="quick-prompt-chip" id="t-quick-method">
+            🎯 Metodologia
+          </button>
+          <button type="button" onclick="triggerQuickPrompt('price')" class="quick-prompt-chip" id="t-quick-price">
+            💬 Investimento
+          </button>
+        </div>
+
+        <!-- Message Input -->
+        <form onsubmit="handleChatSubmit(event)" class="chat-input-bar">
+          <input type="text" id="user-input" placeholder="Envie uma mensagem como lead..." class="chat-input-field" />
+          <button type="submit" class="btn-primary" style="padding: 0.6rem 0.9rem; border-radius: 8px;">
+            <i data-lucide="send" style="width: 14px; height: 14px;"></i>
+          </button>
+        </form>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--border); margin-top: 2rem;">
+        <button type="button" onclick="goToStep(2)" class="btn-secondary">
+          <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+          <span id="t-btn-back-2">VOLTAR AO QR CODE</span>
+        </button>
+        <div style="text-align: right;">
+          <span class="mono" style="color: #10b981; font-weight: 700; font-size: 0.85rem; display: block;" id="t-step3-approved">HOMOLOGADO PARA PRODUÇÃO</span>
+          <span style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 300;" id="t-step3-approved-desc">O assessor atenderá automaticamente qualquer lead que chamar no seu WhatsApp.</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: Client Dedicated Link Generator (For Pedro) -->
+  <!-- ===================================================================== -->
+  <div id="linkgen-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <button type="button" onclick="closeLinkGenModal()" class="modal-close">
+        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+      </button>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(249, 71, 19, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+          <i data-lucide="share-2" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div>
+          <h3 class="brand-font" style="font-size: 1.35rem; color: #ffffff;" id="t-modal-linkgen-title">Gerador de Links de Onboarding por Cliente</h3>
+          <p class="mono" style="font-size: 0.72rem; color: var(--secondary);" id="t-modal-linkgen-sub">VINCULAÇÃO DE WORKFLOW EXCLUSIVO N8N</p>
+        </div>
+      </div>
+
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem; font-weight: 300;" id="t-modal-linkgen-desc">
+        Gere um link personalizado para cada cliente. Quando o cliente abrir o link enviado por você, o portal enviará os dados <strong>exclusivamente para o workflow do n8n que você configurou para ele</strong>, sem que ele precise ver ou configurar nenhuma URL técnica.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 1.5rem;">
+        <!-- Public Portal Base URL Input -->
+        <div>
+          <label class="form-label" for="gen-base-url-input" id="t-modal-linkgen-lbl-baseurl">
+            1. Domínio Público do Portal (URL Base na Internet)
+          </label>
+          <input type="url" id="gen-base-url-input" oninput="updateGeneratedLink()" placeholder="https://onboarding.odiretorcriativo.com" class="form-input" style="font-size: 0.85rem; font-family: var(--font-mono);" />
+          <p class="form-help" id="t-modal-linkgen-help-baseurl">O domínio público onde este site está hospedado na sua VPS/Coolify. Garante que o link funcione no celular do cliente.</p>
+        </div>
+
+        <!-- Localhost Detection Alert Banner -->
+        <div id="gen-localhost-warning" class="hidden" style="background: rgba(251, 188, 0, 0.08); border: 1px solid rgba(251, 188, 0, 0.3); border-radius: 8px; padding: 0.75rem 1rem; display: flex; align-items: flex-start; gap: 0.65rem;">
+          <i data-lucide="info" style="width: 18px; height: 18px; color: var(--secondary); flex-shrink: 0; margin-top: 0.1rem;"></i>
+          <p style="font-size: 0.78rem; color: #fdf8f6; line-height: 1.45;" id="t-modal-linkgen-localhost-tip">
+            <strong>Atenção:</strong> Você está acessando em <code>localhost:3000</code>. O link abaixo foi automaticamente gerado com o seu <strong>domínio público</strong> configurado para que seu cliente consiga abrir de qualquer celular ou computador na internet.
+          </p>
+        </div>
+
+        <!-- Webhook URL Input -->
+        <div>
+          <label class="form-label" for="gen-webhook-input" id="t-modal-linkgen-lbl-webhook">
+            2. URL do Webhook do n8n deste Cliente (Obrigatório)
+          </label>
+          <input type="url" id="gen-webhook-input" oninput="updateGeneratedLink()" placeholder="https://n8n.suaempresa.com/webhook/coach-alex-onboarding" class="form-input" style="font-size: 0.85rem; font-family: var(--font-mono);" />
+          <p class="form-help" id="t-modal-linkgen-help-webhook">A URL do nó "Webhook: Iniciar Onboarding" criado no n8n especificamente para este cliente.</p>
+        </div>
+
+        <div class="form-grid-2">
+          <!-- Client Pre-set Name -->
+          <div>
+            <label class="form-label" for="gen-client-name" id="t-modal-linkgen-lbl-name">
+              3. Nome do Cliente (Opcional)
+            </label>
+            <input type="text" id="gen-client-name" oninput="updateGeneratedLink()" placeholder="Ex: Alex Rivera" class="form-input" />
+            <p class="form-help" id="t-modal-linkgen-help-name">Se preenchido, o nome já virá preenchido no formulário dele.</p>
+          </div>
+
+          <!-- Language Selector for Client -->
+          <div>
+            <label class="form-label" for="gen-client-lang" id="t-modal-linkgen-lbl-lang">
+              4. Idioma do Onboarding
+            </label>
+            <select id="gen-client-lang" onchange="updateGeneratedLink()" class="form-input" style="cursor: pointer;">
+              <option value="pt" selected>🇧🇷 Português (Brasil)</option>
+              <option value="en">🇺🇸 English (US)</option>
+            </select>
+            <p class="form-help" id="t-modal-linkgen-help-lang">Idioma padrão em que o portal abrirá para o cliente.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Live Link Box -->
+      <div style="background: var(--bg-base); border: 1px solid var(--border-accent); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <label class="form-label" style="color: var(--secondary); font-size: 0.75rem;" id="t-modal-linkgen-lbl-ready">
+          🔗 Link Exclusivo Pronto para Enviar ao Cliente:
+        </label>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <input type="text" id="generated-client-link" readonly class="form-input" style="font-size: 0.8rem; font-family: var(--font-mono); color: #fff; background: var(--bg-surface);" />
+          <button type="button" onclick="copyGeneratedLink()" id="btn-copy-link" class="btn-primary" style="white-space: nowrap; padding: 0.6rem 1rem; font-size: 0.8rem;">
+            <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+            <span id="t-modal-linkgen-btn-copy">Copiar Link</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" onclick="testGeneratedLink()" class="btn-secondary" style="font-size: 0.82rem; padding: 0.65rem 1.25rem;" id="btn-test-gen-link">
+          <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+          <span id="t-modal-linkgen-btn-test">Testar Link Neste Navegador</span>
+        </button>
+        <button type="button" onclick="closeLinkGenModal()" class="btn-primary" style="font-size: 0.82rem; padding: 0.65rem 1.25rem;">
+          <span id="t-modal-linkgen-btn-done">Concluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: Architecture & VPS Connection Guide -->
+  <!-- ===================================================================== -->
+  <div id="vps-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <button type="button" onclick="closeVpsModal()" class="modal-close">
+        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+      </button>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(249, 71, 19, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+          <i data-lucide="network" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div>
+          <h3 class="brand-font" style="font-size: 1.35rem; color: #ffffff;" id="t-modal-vps-title">Como este Site se Comunica com a sua VPS</h3>
+          <p class="mono" style="font-size: 0.72rem; color: var(--secondary);" id="t-modal-vps-sub">ARQUITETURA N8N + EVOLUTION API V2</p>
+        </div>
+      </div>
+
+      <!-- Explanatory Diagram & Flow -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <h4 style="font-size: 0.9rem; color: #ffffff; margin-bottom: 0.75rem; font-family: var(--font-heading);" id="t-modal-vps-flow-title">
+          O Fluxo em 4 Passos Exatos:
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.82rem; color: var(--text-secondary);">
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span class="arch-step-badge">1</span>
+            <div id="t-modal-vps-step1">
+              <strong style="color: #ffffff;">O cliente preenche o formulário:</strong> Os dados (nome da mentoria, telefone VIP, link de agenda) são enviados via requisição <code class="mono" style="color: var(--secondary); background: var(--bg-base); padding: 0.1rem 0.3rem; border-radius: 4px;">POST</code> para o Webhook do seu n8n.
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span class="arch-step-badge">2</span>
+            <div id="t-modal-vps-step2">
+              <strong style="color: #ffffff;">O n8n processa na sua VPS:</strong> Salva as diretrizes do cliente (no Data Table) e chama a Evolution API localmente: <code class="mono" style="color: var(--secondary); background: var(--bg-base); padding: 0.1rem 0.3rem; border-radius: 4px;">POST /instance/create</code>.
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span class="arch-step-badge">3</span>
+            <div id="t-modal-vps-step3">
+              <strong style="color: #ffffff;">A Evolution API gera o QR Code:</strong> Retorna a imagem do QR Code em Base64 para o n8n, que repassa diretamente de volta para a tela do navegador do cliente.
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <span class="arch-step-badge">4</span>
+            <div id="t-modal-vps-step4">
+              <strong style="color: #ffffff;">O cliente lê o QR Code com o celular:</strong> A sessão é conectada na hora na Evolution API da sua VPS. Zero senhas expostas e zero arquivos para o cliente baixar!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Webhook Configuration for Local Testing -->
+      <div style="margin-bottom: 1.5rem;">
+        <label class="form-label" for="input-vps-webhook" id="t-modal-vps-lbl-webhook">
+          URL Padrão do Webhook do seu n8n (Opcional):
+        </label>
+        <input type="url" id="input-vps-webhook" placeholder="https://n8n.suaempresa.com/webhook/client-onboarding" class="form-input" style="font-size: 0.85rem; font-family: var(--font-mono);" />
+        <p class="form-help" id="t-modal-vps-help-webhook">
+          Deixe em branco para rodar no <strong>Modo Demonstração (Sandbox)</strong> imediato, ou insira a URL do seu n8n para gerar QR Codes reais da sua Evolution API.
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="workflow_vps_client_onboarding.json" download="workflow_vps_client_onboarding.json" class="btn-secondary" style="font-size: 0.8rem; padding: 0.6rem 1rem;">
+          <i data-lucide="download" style="width: 15px; height: 15px;"></i>
+          <span id="t-modal-vps-btn-download">Baixar Workflow n8n Pronto (.JSON)</span>
+        </a>
+        <button type="button" onclick="saveVpsConfig()" class="btn-primary" style="font-size: 0.85rem; padding: 0.65rem 1.4rem;">
+          <span id="t-modal-vps-btn-save">SALVAR CONFIGURAÇÃO</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Canonical Authority Signature -->
+  <footer>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+      <span class="brand-font" style="font-weight: 700; color: #ffffff;">odiretorcriativo</span>
+      <span style="color: var(--border);">|</span>
+      <span class="mono" style="font-size: 0.75rem; color: var(--secondary);">SOVEREIGN AI AUTOMATION ECOSYSTEM</span>
+    </div>
+    <p style="font-weight: 300; font-size: 0.8rem; color: var(--text-secondary);" id="t-footer-desc">
+      Infraestrutura n8n &bull; Evolution API v2 &bull; Modelos de IA Soberana &bull; <a href="https://odiretorcriativo.hotmart.host/" target="_blank">Acessar Ecossistema Oficial</a>
+    </p>
+  </footer>
+
+  <!-- Script Logic, Link Generator & Multilingual Engine -->
+  <script>
+    let currentLang = 'pt';
+    let vpsWebhookUrl = localStorage.getItem('vps_onboarding_webhook') || '';
+    let isClientDedicatedMode = false;
+
+    const I18N = {
+      pt: {
+        docTitle: "odiretorcriativo | Portal de Ativação do Assessor Executivo de WhatsApp",
+        navBadge: "ASSESSOR EXECUTIVO IA // WHATSAPP",
+        directorBtn: "GERAR LINK DE CLIENTE",
+        vpsBtn: "CONEXÃO VPS",
+        clientBannerTitle: "Ambiente de Onboarding Dedicado",
+        clientBannerBadge: "WORKFLOW INDIVIDUAL VINCULADO",
+        clientBannerActive: "● CONEXÃO PRIVADA ATIVA",
+        heroBadge: "SISTEMAS OPERACIONAIS VIVOS",
+        heroTitle: 'Ativação do seu <span class="highlight">Assessor Executivo</span>',
+        heroDesc: "Preencha suas diretrizes comerciais, conecte sua agenda e aponte a câmera do WhatsApp para o QR Code. Sua inteligência de vendas e agendamento estará ativa em menos de 60 segundos.",
+        tab1: "SUAS DIRETRIZES",
+        tab2: "PAREAMENTO QR CODE",
+        tab3: "SANDBOX AO VIVO",
+        step1Title: "1. Diretrizes da sua Marca & Agenda",
+        step1Subtitle: "Estas informações moldam a voz, a postura e o link de agendamento que seu assessor enviará aos leads.",
+        step1Tag: "FASE 1 DE 3",
+        lblName: "Nome do Mentor ou Marca da Mentoria",
+        defaultName: "Alex Rivera — Aceleração Executiva",
+        placeholderName: "Ex: Mentoria High-Ticket Dr. Felipe",
+        helpName: "Como o robô se apresentará na primeira mensagem ao lead.",
+        lblPhone: "Seu WhatsApp Pessoal (Alertas VIP)",
+        defaultPhone: "5511999998888",
+        placeholderPhone: "Ex: 5511999998888 (com DDI e DDD)",
+        helpPhone: "Para onde o robô enviará notificações imediatas quando qualificar um lead de alta renda.",
+        lblCalendar: "Link da sua Agenda (Google Calendar / Cal.com)",
+        defaultCalendar: "https://calendar.google.com/calendar/u/0/appointments/schedules/SEU_LINK",
+        helpCalendar: "O robô enviará este link automaticamente no momento exato do fechamento da conversa.",
+        lblNiche: "Foco Principal ou Promessa Central da Mentoria",
+        defaultNiche: "Transição de Carreira para Cargos de Diretoria e C-Suite",
+        placeholderNiche: "Ex: Transição para VP, aumento salarial executivo, aceleração de carreira",
+        helpNiche: "O tema central que o assessor usará para demonstrar autoridade nas respostas.",
+        btnStep1: "SALVAR & GERAR QR CODE",
+        step2Title: "2. Pareamento Instantâneo do WhatsApp",
+        step2Subtitle: "Conecte o número de telefone que responderá seus leads em tempo real.",
+        step2Tag: "FASE 2 DE 3",
+        qrWaiting: "AGUARDANDO LEITURA DO APARELHO...",
+        qrSimulateBtn: "[ Simular Leitura do QR Code ]",
+        qrSuccessTitle: "WhatsApp Conectado!",
+        qrSuccessSub: "SESSÃO CRIPTOGRAFADA ATIVA",
+        vpsIndicatorSandbox: "[ MODO SANDBOX LOCAL ]",
+        vpsIndicatorConnecting: "[ WORKFLOW DEDICADO: CONECTANDO... ]",
+        vpsIndicatorConnectingGeneral: "[ VPS AO VIVO: CONECTANDO... ]",
+        vpsIndicatorActive: (name) => `[ CONEXÃO ATIVA: INSTÂNCIA ${name.toUpperCase()} ]`,
+        vpsIndicatorOffline: "[ MODO SANDBOX LOCAL (OFFLINE) ]",
+        instrTitle: "Como Conectar no seu Celular:",
+        instr1: "Abra o aplicativo do <strong>WhatsApp</strong> no seu celular.",
+        instr2: "Acesse <strong>Aparelhos Conectados</strong> (nos 3 pontinhos no Android ou em Configurações no iPhone).",
+        instr3: "Toque no botão <strong>Conectar um Aparelho</strong>.",
+        instr4: "Aponte a câmera para o QR Code ao lado.",
+        secTitle: "PRIVACIDADE E CONTROLE TOTAL",
+        secDesc: "Seu celular continua funcionando normalmente para uso pessoal. Você pode desconectar o assessor a qualquer momento direto pelo menu de Aparelhos Conectados do seu WhatsApp.",
+        btnBack: "VOLTAR",
+        btnStep2: "AVANÇAR PARA SANDBOX",
+        step3Title: "3. Teste ao Vivo no Simulador",
+        step3Subtitle: "Experimente interagir como se fosse um lead para validar a postura, qualificação e agendamento.",
+        step3Tag: "ASSESSOR ATIVO",
+        // Real Evolution Test Card
+        realTestTitle: "Teste em Tempo Real via Evolution API",
+        realTestStatus: "INSTÂNCIA CONECTADA NA SUA VPS",
+        btnRealWhatsAppTest: "Disparar Teste no meu WhatsApp",
+        realTestDesc: "O simulador abaixo envia mensagens diretamente para o cérebro do seu n8n e Evolution API na VPS. Você também pode disparar uma mensagem de teste diretamente para o seu aparelho físico no botão acima!",
+        realTestNeedWebhook: "Configure a URL do Webhook do seu n8n para disparar mensagens no seu WhatsApp físico.",
+        realTestSending: "Disparando via Evolution API...",
+        realTestSuccess: (phone) => `Mensagem de teste enviada com sucesso para o seu WhatsApp (${phone}) via Evolution API! Verifique seu celular agora.`,
+        realTestError: "Não foi possível conectar à Evolution API da VPS. Verifique se o workflow do n8n está ativo.",
+        vpsLiveSourceBadge: "[IA REAL DA VPS // EVOLUTION API]",
+        localSandboxSourceBadge: "[MODO DEMONSTRAÇÃO LOCAL]",
+        chatOnline: "online",
+        chatSandbox: "SANDBOX",
+        quickVIPLabel: "👑 Lead VIP (Diretor R$ 28k)",
+        quickMethodLabel: "🎯 Metodologia",
+        quickPriceLabel: "💬 Investimento",
+        quickVIPText: "Sou Diretor de TI, recebo R$ 28k e busco transição urgente para VP.",
+        quickMethodText: "Como funciona a metodologia de 90 dias?",
+        quickPriceText: "Qual o investimento da mentoria?",
+        inputPlaceholder: "Envie uma mensagem como lead...",
+        btnBackQR: "VOLTAR AO QR CODE",
+        step3Approved: "HOMOLOGADO PARA PRODUÇÃO",
+        step3ApprovedDesc: "O assessor atenderá automaticamente qualquer lead que chamar no seu WhatsApp.",
+        footerDesc: 'Infraestrutura n8n &bull; Evolution API v2 &bull; Modelos de IA Soberana &bull; <a href="https://odiretorcriativo.hotmart.host/" target="_blank">Acessar Ecossistema Oficial</a>',
+        typingIndicator: "Consultando IA na VPS via Evolution API...",
+        chatIntroTemplate: (brand) => `
+          <p>Olá! Seja muito bem-vindo à <strong style="color: #ffffff;">${escapeHtml(brand)}</strong>.</p>
+          <p style="margin-top: 0.5rem; color: var(--text-secondary);">Sou o assessor estratégico da mentoria. Em que desafio de transição ou liderança executiva podemos te acelerar hoje?</p>
+          <span class="mono" style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); display: block; text-align: right; margin-top: 0.35rem;">10:00</span>
+        `,
+        vipReply: (cal) => `Excelente momento de carreira. Uma transição de Diretoria para VP exige calibração de governança, conselho e pacote de equity estratégico.<br><br>Pela alta relevância do seu perfil, abri uma <strong>Sessão Estratégica Individual</strong> prioritária diretamente na agenda do mentor:<br><a href="${cal}" target="_blank" style="color: var(--secondary); text-decoration: underline; font-weight: 700; display: inline-block; margin-top: 0.5rem;">👉 Clique aqui para agendar na Google Agenda</a><br><br><span class="mono" style="font-size: 0.72rem; color: #10b981; display: block; background: rgba(16, 185, 129, 0.1); padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.25);">[ALERTA VIP DISPARADO: Lead Score 96/100 &bull; Notificação enviada ao WhatsApp do Mentor]</span>`,
+        priceReply: () => `A nossa aceleração é customizada para o seu faturamento atual e meta de transição nos próximos 90 dias. Trabalhamos com Sprints Executivos intensivos de 30 dias até contratos de Mentoria Contínua.<br><br>Qual é o seu objetivo de aumento salarial ou novo cargo para este trimestre?`,
+        methodReply: () => `A nossa metodologia de aceleração em 90 dias foca em 3 eixos fundamentais: <strong>1) Reposicionamento de Autoridade</strong>, <strong>2) Mapeamento de Vagas Ocultas de Liderança</strong> e <strong>3) Negociação de Contrato com Base em ROI</strong>.<br><br>Qual é o principal obstáculo que você enfrenta na sua ascensão executiva hoje?`,
+        // Modals
+        modalLinkgenTitle: "Gerador de Links de Onboarding por Cliente",
+        modalLinkgenSub: "VINCULAÇÃO DE WORKFLOW EXCLUSIVO N8N",
+        modalLinkgenDesc: "Gere um link personalizado para cada cliente. Quando o cliente abrir o link enviado por você, o portal enviará os dados <strong>exclusivamente para o workflow do n8n que você configurou para ele</strong>, sem que ele precise ver ou configurar nenhuma URL técnica.",
+        modalLinkgenLblBaseUrl: "1. Domínio Público do Portal (URL Base na Internet)",
+        modalLinkgenHelpBaseUrl: "O domínio público onde este site está hospedado na sua VPS/Coolify (ex: https://onboarding.odiretorcriativo.com). Garante que o link funcione no celular do cliente.",
+        modalLinkgenLocalhostTip: "<strong>Atenção:</strong> Você está acessando em <code>localhost:3000</code>. O link abaixo foi automaticamente gerado com o seu <strong>domínio público</strong> configurado para que seu cliente consiga abrir de qualquer celular ou computador na internet.",
+        modalLinkgenLblWebhook: "2. URL do Webhook do n8n deste Cliente (Obrigatório)",
+        modalLinkgenHelpWebhook: 'A URL do nó "Webhook: Iniciar Onboarding" criado no n8n especificamente para este cliente.',
+        modalLinkgenLblName: "3. Nome do Cliente (Opcional)",
+        modalLinkgenHelpName: "Se preenchido, o nome já virá preenchido no formulário dele.",
+        modalLinkgenLblLang: "4. Idioma do Onboarding",
+        modalLinkgenHelpLang: "Idioma padrão em que o portal abrirá para o cliente.",
+        modalLinkgenLblReady: "🔗 Link Exclusivo Pronto para Enviar ao Cliente:",
+        modalLinkgenBtnCopy: "Copiar Link",
+        modalLinkgenBtnCopied: "Copiado!",
+        modalLinkgenBtnTest: "Testar Link Neste Navegador",
+        modalLinkgenBtnDone: "Concluir",
+        // VPS Modal
+        modalVpsTitle: "Como este Site se Comunica com a sua VPS",
+        modalVpsSub: "ARQUITETURA N8N + EVOLUTION API V2",
+        modalVpsFlowTitle: "O Fluxo em 4 Passos Exatos:",
+        modalVpsStep1: '<strong style="color: #ffffff;">O cliente preenche o formulário:</strong> Os dados (nome da mentoria, telefone VIP, link de agenda) são enviados via requisição <code class="mono" style="color: var(--secondary); background: var(--bg-base); padding: 0.1rem 0.3rem; border-radius: 4px;">POST</code> para o Webhook do seu n8n.',
+        modalVpsStep2: '<strong style="color: #ffffff;">O n8n processa na sua VPS:</strong> Salva as diretrizes do cliente (no Data Table) e chama a Evolution API localmente: <code class="mono" style="color: var(--secondary); background: var(--bg-base); padding: 0.1rem 0.3rem; border-radius: 4px;">POST /instance/create</code>.',
+        modalVpsStep3: '<strong style="color: #ffffff;">A Evolution API gera o QR Code:</strong> Retorna a imagem do QR Code em Base64 para o n8n, que repassa diretamente de volta para a tela do navegador do cliente.',
+        modalVpsStep4: '<strong style="color: #ffffff;">O cliente lê o QR Code com o celular:</strong> A sessão é conectada na hora na Evolution API da sua VPS. Zero senhas expostas e zero arquivos para o cliente baixar!',
+        modalVpsLblWebhook: "URL Padrão do Webhook do seu n8n (Opcional):",
+        modalVpsHelpWebhook: "Deixe em branco para rodar no <strong>Modo Demonstração (Sandbox)</strong> imediato, ou insira a URL do seu n8n para gerar QR Codes reais da sua Evolution API.",
+        modalVpsBtnDownload: "Baixar Workflow n8n Pronto (.JSON)",
+        modalVpsBtnSave: "SALVAR CONFIGURAÇÃO",
+        vpsAlertSaved: "URL do Webhook da VPS salva com sucesso!",
+        vpsAlertSandbox: "Modo Demonstração (Sandbox) ativado!"
+      },
+      en: {
+        docTitle: "odiretorcriativo | Executive WhatsApp AI Advisor Activation Portal",
+        navBadge: "EXECUTIVE AI ADVISOR // WHATSAPP",
+        directorBtn: "GENERATE CLIENT LINK",
+        vpsBtn: "VPS SETUP",
+        clientBannerTitle: "Dedicated Onboarding Environment",
+        clientBannerBadge: "INDIVIDUAL WORKFLOW CONNECTED",
+        clientBannerActive: "● PRIVATE CONNECTION ACTIVE",
+        heroBadge: "LIVE OPERATIONAL SYSTEMS",
+        heroTitle: 'Activation of your <span class="highlight">Executive AI Advisor</span>',
+        heroDesc: "Set your business guidelines, link your calendar, and scan the WhatsApp QR Code. Your automated sales and booking intelligence will be operational in under 60 seconds.",
+        tab1: "YOUR DIRECTIVES",
+        tab2: "QR CODE PAIRING",
+        tab3: "LIVE SANDBOX",
+        step1Title: "1. Brand Directives & Calendar Setup",
+        step1Subtitle: "This information establishes the authority, executive posture, and calendar link your AI advisor delivers to leads.",
+        step1Tag: "PHASE 1 OF 3",
+        lblName: "Mentor Name or Mentorship Brand",
+        defaultName: "Alex Rivera — Executive Acceleration",
+        placeholderName: "E.g. High-Ticket Executive Mentorship Dr. Philip",
+        helpName: "How the advisor introduces itself in the opening message to clients.",
+        lblPhone: "Your Personal WhatsApp (VIP Lead Alerts)",
+        defaultPhone: "14155552671",
+        placeholderPhone: "E.g. 14155552671 (with Country Code and Area Code)",
+        helpPhone: "Where the AI sends immediate notifications upon qualifying high-earning leads.",
+        lblCalendar: "Your Booking Calendar Link (Google Calendar / Cal.com)",
+        defaultCalendar: "https://calendar.google.com/calendar/u/0/appointments/schedules/YOUR_LINK",
+        helpCalendar: "The bot automatically shares this link at the exact moment of closing.",
+        lblNiche: "Core Focus or Primary Promise of your Mentorship",
+        defaultNiche: "Career Transition to VP & C-Suite Leadership Roles",
+        placeholderNiche: "E.g. Transition to VP, executive compensation increase, fast-track leadership",
+        helpNiche: "The central domain authority the advisor uses throughout all conversations.",
+        btnStep1: "SAVE & GENERATE QR CODE",
+        step2Title: "2. Instant WhatsApp QR Code Pairing",
+        step2Subtitle: "Pair the business phone number that will automatically respond to your inbound leads.",
+        step2Tag: "PHASE 2 OF 3",
+        qrWaiting: "AWAITING SMARTPHONE CAMERA SCAN...",
+        qrSimulateBtn: "[ Simulate QR Code Scan ]",
+        qrSuccessTitle: "WhatsApp Connected!",
+        qrSuccessSub: "ENCRYPTED SESSION ACTIVE",
+        vpsIndicatorSandbox: "[ LOCAL SANDBOX MODE ]",
+        vpsIndicatorConnecting: "[ DEDICATED WORKFLOW: CONNECTING... ]",
+        vpsIndicatorConnectingGeneral: "[ LIVE VPS: CONNECTING... ]",
+        vpsIndicatorActive: (name) => `[ CONNECTION ACTIVE: INSTANCE ${name.toUpperCase()} ]`,
+        vpsIndicatorOffline: "[ LOCAL SANDBOX MODE (OFFLINE) ]",
+        instrTitle: "How to Link on Your Smartphone:",
+        instr1: "Open the <strong>WhatsApp</strong> application on your smartphone.",
+        instr2: "Navigate to <strong>Linked Devices</strong> (3 dots on Android, Settings on iPhone).",
+        instr3: "Tap the <strong>Link a Device</strong> button.",
+        instr4: "Point your camera at the QR Code on the left.",
+        secTitle: "PRIVACY & SOVEREIGN CONTROL",
+        secDesc: "Your phone operates 100% normally for personal use. You can disconnect the AI advisor at any time directly through your WhatsApp Linked Devices menu.",
+        btnBack: "BACK",
+        btnStep2: "PROCEED TO LIVE SANDBOX",
+        step3Title: "3. Live Sandbox Simulator",
+        step3Subtitle: "Interact as a prospective client to evaluate tone, qualification precision, and automated booking.",
+        step3Tag: "ADVISOR ACTIVE",
+        // Real Evolution Test Card
+        realTestTitle: "Real-Time Test via Evolution API",
+        realTestStatus: "INSTANCE CONNECTED ON YOUR VPS",
+        btnRealWhatsAppTest: "Send Test Message to my Real WhatsApp",
+        realTestDesc: "The sandbox below sends messages directly to your n8n AI engine and Evolution API on the VPS. You can also dispatch a live test message directly to your physical smartphone using the button above!",
+        realTestNeedWebhook: "Configure your n8n Webhook URL to deliver real test messages to your physical WhatsApp.",
+        realTestSending: "Dispatching via Evolution API...",
+        realTestSuccess: (phone) => `Test message successfully delivered to your WhatsApp (${phone}) via Evolution API! Check your phone now.`,
+        realTestError: "Unable to reach VPS Evolution API. Verify your n8n workflow is active.",
+        vpsLiveSourceBadge: "[LIVE VPS AI // EVOLUTION API]",
+        localSandboxSourceBadge: "[LOCAL SANDBOX DEMO]",
+        chatOnline: "online",
+        chatSandbox: "SANDBOX",
+        quickVIPLabel: "👑 VIP Lead ($250k VP Transition)",
+        quickMethodLabel: "🎯 90-Day Method",
+        quickPriceLabel: "💬 Pricing & Tiers",
+        quickVIPText: "I am currently an Engineering Director earning $240k/yr, targeting an immediate VP transition.",
+        quickMethodText: "How does the 90-day acceleration framework work?",
+        quickPriceText: "What is the mentorship investment and structure?",
+        inputPlaceholder: "Send a message as a client...",
+        btnBackQR: "BACK TO QR CODE",
+        step3Approved: "CERTIFIED FOR PRODUCTION",
+        step3ApprovedDesc: "The advisor will autonomously engage every lead messaging your connected WhatsApp.",
+        footerDesc: 'n8n Infrastructure &bull; Evolution API v2 &bull; Sovereign AI Architecture &bull; <a href="https://odiretorcriativo.hotmart.host/" target="_blank">Access Official Ecosystem</a>',
+        typingIndicator: "Consulting VPS AI via Evolution API...",
+        chatIntroTemplate: (brand) => `
+          <p>Hello! Welcome to <strong style="color: #ffffff;">${escapeHtml(brand)}</strong>.</p>
+          <p style="margin-top: 0.5rem; color: var(--text-secondary);">I am the executive advisory assistant for the mentorship. What leadership transition or executive challenge can we help you accelerate today?</p>
+          <span class="mono" style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); display: block; text-align: right; margin-top: 0.35rem;">10:00 AM</span>
+        `,
+        vipReply: (cal) => `Outstanding career track record. Moving from a Director role into a VP or C-suite position demands board-level positioning, governance mastery, and strategic compensation structuring.<br><br>Given your executive seniority, I have reserved a priority <strong>Private Executive Session</strong> directly on the mentor's personal calendar:<br><a href="${cal}" target="_blank" style="color: var(--secondary); text-decoration: underline; font-weight: 700; display: inline-block; margin-top: 0.5rem;">👉 Click here to reserve your time on Google Calendar</a><br><br><span class="mono" style="font-size: 0.72rem; color: #10b981; display: block; background: rgba(16, 185, 129, 0.1); padding: 0.35rem 0.5rem; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.25);">[VIP ALERT DISPATCHED: Lead Score 96/100 &bull; Instant alert sent to Mentor's WhatsApp]</span>`,
+        priceReply: () => `Our acceleration programs are customized according to your current compensation tier and your target 90-day trajectory. We work with 30-Day Executive Sprints up to ongoing Advisory partnerships.<br><br>What is your target compensation increase or target title for this quarter?`,
+        methodReply: () => `Our 90-day acceleration framework focuses on 3 foundational pillars: <strong>1) Executive Authority Repositioning</strong>, <strong>2) Unlocking the Hidden Executive Job Market</strong>, and <strong>3) Value-Based Compensation Package Negotiation</strong>.<br><br>What is the single biggest bottleneck in your executive ascension right now?`,
+        // Modals
+        modalLinkgenTitle: "Client Dedicated Onboarding Link Generator",
+        modalLinkgenSub: "DEDICATED N8N WORKFLOW BINDING",
+        modalLinkgenDesc: "Generate a custom link for each client. When the client opens your link, the portal routes all data <strong>strictly to the dedicated n8n workflow you assigned to them</strong>, hiding all technical backend details.",
+        modalLinkgenLblBaseUrl: "1. Portal Public Domain (Base URL)",
+        modalLinkgenHelpBaseUrl: "The public domain where this site is hosted on your VPS/Coolify (e.g. https://onboarding.odiretorcriativo.com). Ensures the link works on your client's mobile or desktop.",
+        modalLinkgenLocalhostTip: "<strong>Note:</strong> You are accessing this panel on <code>localhost:3000</code>. The link below was automatically built using your <strong>public domain</strong> so your client can open it anywhere on the internet.",
+        modalLinkgenLblWebhook: "2. Client n8n Webhook URL (Required)",
+        modalLinkgenHelpWebhook: 'The Webhook node URL configured in n8n specifically for this client.',
+        modalLinkgenLblName: "3. Client Name (Optional)",
+        modalLinkgenHelpName: "If provided, the name will be pre-filled on their form.",
+        modalLinkgenLblLang: "4. Onboarding Language",
+        modalLinkgenHelpLang: "Default language in which the portal opens for the client.",
+        modalLinkgenLblReady: "🔗 Dedicated Link Ready to Send to Client:",
+        modalLinkgenBtnCopy: "Copy Link",
+        modalLinkgenBtnCopied: "Copied!",
+        modalLinkgenBtnTest: "Test Link in this Browser",
+        modalLinkgenBtnDone: "Done",
+        // VPS Modal
+        modalVpsTitle: "How this Portal Communicates with your VPS",
+        modalVpsSub: "N8N + EVOLUTION API V2 ARCHITECTURE",
+        modalVpsFlowTitle: "The Exact 4-Step Lifecycle:",
+        modalVpsStep1: '<strong style="color: #ffffff;">Client fills the web form:</strong> All data (mentorship brand, VIP phone, calendar link) is sent via <code class="mono" style="color: var(--secondary); background: var(--bg-base); padding: 0.1rem 0.3rem; border-radius: 4px;">POST</code> request directly to your n8n Webhook.',
+        modalVpsStep2: '<strong style="color: #ffffff;">n8n processes on your VPS:</strong> Saves client directives into a Data Table and calls Evolution API internally: <code class="mono" style="color: var(--secondary); background: var(--bg-base); padding: 0.1rem 0.3rem; border-radius: 4px;">POST /instance/create</code>.',
+        modalVpsStep3: '<strong style="color: #ffffff;">Evolution API generates QR Code:</strong> Returns the live Base64 QR Code image to n8n, which streams it straight back to the client\'s web browser.',
+        modalVpsStep4: '<strong style="color: #ffffff;">Client scans with their phone:</strong> The session links instantly inside Evolution API on your VPS. Zero credentials exposed, zero files to download!',
+        modalVpsLblWebhook: "Default n8n Webhook URL (Optional):",
+        modalVpsHelpWebhook: "Leave blank to run in instant <strong>Sandbox Demo Mode</strong>, or enter your n8n URL to generate live QR Codes from your Evolution API.",
+        modalVpsBtnDownload: "Download Ready-to-Use n8n Workflow (.JSON)",
+        modalVpsBtnSave: "SAVE CONFIGURATION",
+        vpsAlertSaved: "VPS Webhook URL saved successfully!",
+        vpsAlertSandbox: "Sandbox Demo Mode activated!"
+      }
+    };
+
+    let clientConfig = {
+      name: "",
+      phone: "",
+      calendar: "",
+      niche: "",
+      instanceName: "coach-alex"
+    };
+
+    function initLanguage() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('lang');
+      const savedLang = localStorage.getItem('izy_onboarding_lang');
+
+      if (urlLang === 'en' || urlLang === 'pt') {
+        currentLang = urlLang;
+      } else if (savedLang === 'en' || savedLang === 'pt') {
+        currentLang = savedLang;
+      } else {
+        const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+        currentLang = browserLang.startsWith('en') ? 'en' : 'pt';
+      }
+
+      const t = I18N[currentLang];
+      clientConfig.name = t.defaultName;
+      clientConfig.phone = t.defaultPhone;
+      clientConfig.calendar = t.defaultCalendar;
+      clientConfig.niche = t.defaultNiche;
+      clientConfig.instanceName = currentLang === 'en' ? "coach-alex-en" : "coach-alex";
+
+      const urlWebhook = urlParams.get('webhook');
+      const urlClient = urlParams.get('client');
+      const urlNiche = urlParams.get('niche');
+
+      if (urlWebhook && urlWebhook.startsWith('http')) {
+        vpsWebhookUrl = decodeURIComponent(urlWebhook);
+        isClientDedicatedMode = true;
+
+        const banner = document.getElementById('dedicated-client-banner');
+        if (banner) banner.classList.remove('hidden');
+
+        document.getElementById('btn-director-link-gen').style.display = 'none';
+        document.getElementById('t-vps-btn').style.display = 'none';
+      }
+
+      if (urlClient) {
+        clientConfig.name = decodeURIComponent(urlClient);
+      }
+      if (urlNiche) {
+        clientConfig.niche = decodeURIComponent(urlNiche);
+      }
+
+      applyLanguage(currentLang, false);
+      updateGeneratedLink();
+    }
+
+    function setLanguage(lang) {
+      if (lang !== 'pt' && lang !== 'en') return;
+      currentLang = lang;
+      localStorage.setItem('izy_onboarding_lang', lang);
+
+      const url = new URL(window.location);
+      url.searchParams.set('lang', lang);
+      window.history.replaceState({}, '', url);
+
+      applyLanguage(lang, true);
+    }
+
+    function applyLanguage(lang, isUserToggle) {
+      const t = I18N[lang];
+      document.title = t.docTitle;
+      document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
+
+      document.getElementById('lang-btn-pt').classList.toggle('active', lang === 'pt');
+      document.getElementById('lang-btn-en').classList.toggle('active', lang === 'en');
+
+      // Top Navigation
+      document.getElementById('t-nav-badge').innerText = t.navBadge;
+      document.getElementById('t-director-btn').innerText = t.directorBtn;
+      document.getElementById('t-vps-btn-text').innerText = t.vpsBtn;
+
+      // Dedicated Client Banner
+      document.getElementById('t-client-banner-title').innerText = t.clientBannerTitle;
+      document.getElementById('t-client-banner-badge').innerText = t.clientBannerBadge;
+      document.getElementById('t-client-banner-active').innerText = t.clientBannerActive;
+
+      // Hero Header
+      document.getElementById('t-hero-badge').innerText = t.heroBadge;
+      document.getElementById('t-hero-title').innerHTML = t.heroTitle;
+      document.getElementById('t-hero-desc').innerText = t.heroDesc;
+
+      // Stepper
+      document.getElementById('t-tab-1').innerText = t.tab1;
+      document.getElementById('t-tab-2').innerText = t.tab2;
+      document.getElementById('t-tab-3').innerText = t.tab3;
+
+      // Step 1
+      document.getElementById('t-step1-title').innerText = t.step1Title;
+      document.getElementById('t-step1-subtitle').innerText = t.step1Subtitle;
+      document.getElementById('t-step1-tag').innerText = t.step1Tag;
+      document.getElementById('t-lbl-name').innerText = t.lblName;
+      document.getElementById('t-help-name').innerText = t.helpName;
+      document.getElementById('t-lbl-phone').innerText = t.lblPhone;
+      document.getElementById('t-help-phone').innerText = t.helpPhone;
+      document.getElementById('t-lbl-calendar').innerText = t.lblCalendar;
+      document.getElementById('t-help-calendar').innerText = t.helpCalendar;
+      document.getElementById('t-lbl-niche').innerText = t.lblNiche;
+      document.getElementById('t-help-niche').innerText = t.helpNiche;
+      document.getElementById('t-btn-step1').innerText = t.btnStep1;
+
+      const inputName = document.getElementById('input-client-name');
+      const inputPhone = document.getElementById('input-client-phone');
+      const inputCalendar = document.getElementById('input-client-calendar');
+      const inputNiche = document.getElementById('input-client-niche');
+
+      inputName.placeholder = t.placeholderName;
+      inputPhone.placeholder = t.placeholderPhone;
+      inputCalendar.placeholder = t.defaultCalendar;
+      inputNiche.placeholder = t.placeholderNiche;
+
+      if (!isClientDedicatedMode) {
+        const otherLang = lang === 'pt' ? 'en' : 'pt';
+        if (isUserToggle) {
+          if (inputName.value === I18N[otherLang].defaultName || !inputName.value) {
+            inputName.value = t.defaultName;
+            clientConfig.name = t.defaultName;
+          }
+          if (inputNiche.value === I18N[otherLang].defaultNiche || !inputNiche.value) {
+            inputNiche.value = t.defaultNiche;
+            clientConfig.niche = t.defaultNiche;
+          }
+          if (inputPhone.value === I18N[otherLang].defaultPhone || !inputPhone.value) {
+            inputPhone.value = t.defaultPhone;
+            clientConfig.phone = t.defaultPhone;
+          }
+          if (inputCalendar.value === I18N[otherLang].defaultCalendar || !inputCalendar.value) {
+            inputCalendar.value = t.defaultCalendar;
+            clientConfig.calendar = t.defaultCalendar;
+          }
+        } else {
+          inputName.value = clientConfig.name || t.defaultName;
+          inputNiche.value = clientConfig.niche || t.defaultNiche;
+          inputPhone.value = clientConfig.phone || t.defaultPhone;
+          inputCalendar.value = clientConfig.calendar || t.defaultCalendar;
+        }
+      } else {
+        inputName.value = clientConfig.name;
+        inputNiche.value = clientConfig.niche;
+        inputPhone.value = clientConfig.phone;
+        inputCalendar.value = clientConfig.calendar;
+      }
+
+      // Step 2
+      document.getElementById('t-step2-title').innerText = t.step2Title;
+      document.getElementById('t-step2-subtitle').innerText = t.step2Subtitle;
+      document.getElementById('t-step2-tag').innerText = t.step2Tag;
+      document.getElementById('t-qr-waiting').innerText = t.qrWaiting;
+      document.getElementById('t-qr-simulate-btn').innerText = t.qrSimulateBtn;
+      document.getElementById('t-qr-success-title').innerText = t.qrSuccessTitle;
+      document.getElementById('t-qr-success-sub').innerText = t.qrSuccessSub;
+      document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorSandbox;
+      document.getElementById('t-instr-title').innerText = t.instrTitle;
+      document.getElementById('t-instr-1').innerHTML = t.instr1;
+      document.getElementById('t-instr-2').innerHTML = t.instr2;
+      document.getElementById('t-instr-3').innerHTML = t.instr3;
+      document.getElementById('t-instr-4').innerHTML = t.instr4;
+      document.getElementById('t-sec-title-text').innerText = t.secTitle;
+      document.getElementById('t-sec-desc').innerText = t.secDesc;
+      document.getElementById('t-btn-back-1').innerText = t.btnBack;
+      document.getElementById('t-btn-step2').innerText = t.btnStep2;
+
+      // Step 3
+      document.getElementById('t-step3-title').innerText = t.step3Title;
+      document.getElementById('t-step3-subtitle').innerText = t.step3Subtitle;
+      document.getElementById('t-step3-tag').innerText = t.step3Tag;
+      document.getElementById('t-real-test-title').innerText = t.realTestTitle;
+      document.getElementById('t-real-test-status').innerText = t.realTestStatus;
+      document.getElementById('t-btn-real-whatsapp-test').innerText = t.btnRealWhatsAppTest;
+      document.getElementById('t-real-test-desc').innerText = t.realTestDesc;
+      document.getElementById('t-chat-online').innerText = t.chatOnline;
+      document.getElementById('t-chat-sandbox').innerText = t.chatSandbox;
+      document.getElementById('t-quick-vip').innerText = t.quickVIPLabel;
+      document.getElementById('t-quick-method').innerText = t.quickMethodLabel;
+      document.getElementById('t-quick-price').innerText = t.quickPriceLabel;
+      document.getElementById('user-input').placeholder = t.inputPlaceholder;
+      document.getElementById('t-btn-back-2').innerText = t.btnBackQR;
+      document.getElementById('t-step3-approved').innerText = t.step3Approved;
+      document.getElementById('t-step3-approved-desc').innerText = t.step3ApprovedDesc;
+      document.getElementById('t-footer-desc').innerHTML = t.footerDesc;
+
+      // Modals Translation
+      document.getElementById('t-modal-linkgen-title').innerText = t.modalLinkgenTitle;
+      document.getElementById('t-modal-linkgen-sub').innerText = t.modalLinkgenSub;
+      document.getElementById('t-modal-linkgen-desc').innerHTML = t.modalLinkgenDesc;
+      document.getElementById('t-modal-linkgen-lbl-baseurl').innerText = t.modalLinkgenLblBaseUrl;
+      document.getElementById('t-modal-linkgen-help-baseurl').innerText = t.modalLinkgenHelpBaseUrl;
+      document.getElementById('t-modal-linkgen-localhost-tip').innerHTML = t.modalLinkgenLocalhostTip;
+      document.getElementById('t-modal-linkgen-lbl-webhook').innerText = t.modalLinkgenLblWebhook;
+      document.getElementById('t-modal-linkgen-help-webhook').innerText = t.modalLinkgenHelpWebhook;
+      document.getElementById('t-modal-linkgen-lbl-name').innerText = t.modalLinkgenLblName;
+      document.getElementById('t-modal-linkgen-help-name').innerText = t.modalLinkgenHelpName;
+      document.getElementById('t-modal-linkgen-lbl-lang').innerText = t.modalLinkgenLblLang;
+      document.getElementById('t-modal-linkgen-help-lang').innerText = t.modalLinkgenHelpLang;
+      document.getElementById('t-modal-linkgen-lbl-ready').innerText = t.modalLinkgenLblReady;
+      document.getElementById('t-modal-linkgen-btn-copy').innerText = t.modalLinkgenBtnCopy;
+      document.getElementById('t-modal-linkgen-btn-test').innerText = t.modalLinkgenBtnTest;
+      document.getElementById('t-modal-linkgen-btn-done').innerText = t.modalLinkgenBtnDone;
+
+      // VPS Modal
+      document.getElementById('t-modal-vps-title').innerText = t.modalVpsTitle;
+      document.getElementById('t-modal-vps-sub').innerText = t.modalVpsSub;
+      document.getElementById('t-modal-vps-flow-title').innerText = t.modalVpsFlowTitle;
+      document.getElementById('t-modal-vps-step1').innerHTML = t.modalVpsStep1;
+      document.getElementById('t-modal-vps-step2').innerHTML = t.modalVpsStep2;
+      document.getElementById('t-modal-vps-step3').innerHTML = t.modalVpsStep3;
+      document.getElementById('t-modal-vps-step4').innerHTML = t.modalVpsStep4;
+      document.getElementById('t-modal-vps-lbl-webhook').innerText = t.modalVpsLblWebhook;
+      document.getElementById('t-modal-vps-help-webhook').innerHTML = t.modalVpsHelpWebhook;
+      document.getElementById('t-modal-vps-btn-download').innerText = t.modalVpsBtnDownload;
+      document.getElementById('t-modal-vps-btn-save').innerText = t.modalVpsBtnSave;
+
+      document.getElementById('chat-brand-name').innerText = clientConfig.name;
+      updateChatGreeting();
+      lucide.createIcons();
+    }
+
+    function updateChatGreeting() {
+      const bubble = document.getElementById('initial-bot-bubble');
+      if (bubble) {
+        bubble.innerHTML = I18N[currentLang].chatIntroTemplate(clientConfig.name);
+      }
+    }
+
+    function goToStep(step) {
+      for (let i = 1; i <= 3; i++) {
+        const pane = document.getElementById(`pane-step-${i}`);
+        const tab = document.getElementById(`tab-step-${i}`);
+        if (i === step) {
+          pane.classList.remove('hidden');
+          tab.classList.add('active');
+        } else {
+          pane.classList.add('hidden');
+          tab.classList.remove('active');
+        }
+      }
+      lucide.createIcons();
+    }
+
+    async function handleStep1Submit(e) {
+      e.preventDefault();
+      clientConfig.name = document.getElementById('input-client-name').value;
+      clientConfig.phone = document.getElementById('input-client-phone').value;
+      clientConfig.calendar = document.getElementById('input-client-calendar').value;
+      clientConfig.niche = document.getElementById('input-client-niche').value;
+
+      document.getElementById('chat-brand-name').innerText = clientConfig.name;
+      updateChatGreeting();
+
+      goToStep(2);
+
+      const t = I18N[currentLang];
+
+      if (vpsWebhookUrl && vpsWebhookUrl.startsWith('http')) {
+        document.getElementById('vps-mode-indicator').innerText = isClientDedicatedMode ? t.vpsIndicatorConnecting : t.vpsIndicatorConnectingGeneral;
+        document.getElementById('vps-mode-indicator').style.color = "var(--primary)";
+
+        try {
+          const resp = await fetch(vpsWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientName: clientConfig.name,
+              clientPhone: clientConfig.phone,
+              calendarLink: clientConfig.calendar,
+              niche: clientConfig.niche
+            })
+          });
+
+          const data = await resp.json();
+          if (data && data.qrcode) {
+            const matrixWrapper = document.getElementById('qr-matrix-wrapper');
+            const imgSrc = data.qrcode.startsWith('data:image') ? data.qrcode : `data:image/png;base64,${data.qrcode}`;
+            matrixWrapper.innerHTML = `<img src="${imgSrc}" alt="WhatsApp Live QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />`;
+            
+            clientConfig.instanceName = data.instanceName || 'coach-alex';
+            document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorActive(clientConfig.instanceName);
+            document.getElementById('vps-mode-indicator').style.color = "#10b981";
+
+            pollVpsConnectionStatus(clientConfig.instanceName);
+          }
+        } catch (err) {
+          console.warn("VPS Webhook not reachable, falling back to local sandbox:", err);
+          document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorOffline;
+          document.getElementById('vps-mode-indicator').style.color = "var(--secondary)";
+        }
+      } else {
+        document.getElementById('vps-mode-indicator').innerText = t.vpsIndicatorSandbox;
+        document.getElementById('vps-mode-indicator').style.color = "var(--secondary)";
+      }
+    }
+
+    async function pollVpsConnectionStatus(instanceName) {
+      if (!vpsWebhookUrl) return;
+      const statusUrl = vpsWebhookUrl.replace('client-onboarding', 'client-status') + `?instance=${encodeURIComponent(instanceName)}`;
+
+      let attempts = 0;
+      const interval = setInterval(async () => {
+        attempts++;
+        if (attempts > 40) clearInterval(interval); // 2 minutes timeout
+        try {
+          const res = await fetch(statusUrl);
+          const st = await res.json();
+          if (st.state === 'open' || st.state === 'connecting') {
+            clearInterval(interval);
+            simulateScanSuccess();
+          }
+        } catch(e) {
+          // silent fallback
+        }
+      }, 3000);
+    }
+
+    function simulateScanSuccess() {
+      const overlay = document.getElementById('qr-success-overlay');
+      overlay.classList.remove('hidden');
+      setTimeout(() => {
+        goToStep(3);
+      }, 1400);
+    }
+
+    function triggerQuickPrompt(type) {
+      const t = I18N[currentLang];
+      let msg = "";
+      if (type === 'vip') msg = t.quickVIPText;
+      else if (type === 'method') msg = t.quickMethodText;
+      else if (type === 'price') msg = t.quickPriceText;
+
+      document.getElementById('user-input').value = msg;
+      handleChatSubmit(new Event('submit'));
+    }
+
+    // REAL EVOLUTION API TEST: Send live message to client's WhatsApp
+    async function sendRealWhatsAppTestMessage() {
+      const btn = document.getElementById('btn-send-whatsapp-test');
+      const feedback = document.getElementById('real-test-feedback-box');
+      const t = I18N[currentLang];
+      
+      if (!vpsWebhookUrl) {
+        feedback.classList.remove('hidden');
+        feedback.style.background = "rgba(251, 188, 0, 0.1)";
+        feedback.style.borderColor = "rgba(251, 188, 0, 0.3)";
+        feedback.style.color = "var(--secondary)";
+        feedback.innerHTML = `<span>⚠️ ${t.realTestNeedWebhook}</span>`;
+        return;
+      }
+
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<span class="pulse-dot"></span><span>${t.realTestSending}</span>`;
+      btn.disabled = true;
+
+      const sendUrl = vpsWebhookUrl.replace('client-onboarding', 'client-send-test-whatsapp');
+      try {
+        const resp = await fetch(sendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instanceName: clientConfig.instanceName,
+            phone: clientConfig.phone,
+            clientName: clientConfig.name,
+            lang: currentLang
+          })
+        });
+        const data = await resp.json();
+        feedback.classList.remove('hidden');
+        feedback.style.background = "rgba(16, 185, 129, 0.1)";
+        feedback.style.borderColor = "rgba(16, 185, 129, 0.3)";
+        feedback.style.color = "#6ee7b7";
+        feedback.innerHTML = `<span>✅ ${t.realTestSuccess(clientConfig.phone)}</span>`;
+      } catch (err) {
+        feedback.classList.remove('hidden');
+        feedback.style.background = "rgba(239, 68, 68, 0.1)";
+        feedback.style.borderColor = "rgba(239, 68, 68, 0.3)";
+        feedback.style.color = "#fca5a5";
+        feedback.innerHTML = `<span>❌ ${t.realTestError}</span>`;
+      } finally {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+        lucide.createIcons();
+      }
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chat = document.getElementById('chat-stream');
+      const t = I18N[currentLang];
+
+      const userBubble = document.createElement('div');
+      userBubble.className = "chat-bubble-user";
+      userBubble.innerHTML = `
+        <p>${escapeHtml(text)}</p>
+        <span class="mono" style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.7); display: block; text-align: right; margin-top: 0.35rem;">
+          ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+        </span>
+      `;
+      chat.appendChild(userBubble);
+      input.value = '';
+      chat.scrollTop = chat.scrollHeight;
+
+      const typing = document.createElement('div');
+      typing.className = "chat-bubble-bot";
+      typing.id = "bot-typing-indicator";
+      typing.innerHTML = `
+        <span class="mono" style="font-size: 0.75rem; color: var(--secondary);">${t.typingIndicator}</span>
+      `;
+      chat.appendChild(typing);
+      chat.scrollTop = chat.scrollHeight;
+
+      let botReply = "";
+      let isLiveFromVps = false;
+
+      // 1. Try real VPS n8n AI engine
+      if (vpsWebhookUrl && vpsWebhookUrl.startsWith('http')) {
+        const chatUrl = vpsWebhookUrl.replace('client-onboarding', 'client-chat-test');
+        try {
+          const resp = await fetch(chatUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              instanceName: clientConfig.instanceName,
+              userMessage: text,
+              clientName: clientConfig.name,
+              clientPhone: clientConfig.phone,
+              calendarLink: clientConfig.calendar,
+              niche: clientConfig.niche,
+              lang: currentLang
+            })
+          });
+          const data = await resp.json();
+          if (data && data.reply) {
+            botReply = data.reply;
+            isLiveFromVps = true;
+          }
+        } catch(err) {
+          console.warn("Live VPS chat unreachable, fallback to local:", err);
+        }
+      }
+
+      // 2. If VPS not reachable or in sandbox mode, use calibrated local fallback
+      if (!isLiveFromVps) {
+        await new Promise(r => setTimeout(r, 900));
+        const lower = text.toLowerCase();
+
+        if (lower.includes('diretor') || lower.includes('28k') || lower.includes('vp') || lower.includes('urgente') ||
+            lower.includes('director') || lower.includes('240k') || lower.includes('urgent')) {
+          botReply = t.vipReply(clientConfig.calendar);
+        } else if (lower.includes('preço') || lower.includes('valor') || lower.includes('investimento') ||
+                   lower.includes('price') || lower.includes('pricing') || lower.includes('investment') || lower.includes('cost')) {
+          botReply = t.priceReply();
+        } else {
+          botReply = t.methodReply();
+        }
+      }
+
+      const ind = document.getElementById('bot-typing-indicator');
+      if (ind) ind.remove();
+
+      const sourceBadgeHtml = isLiveFromVps
+        ? `<span class="mono" style="font-size: 0.65rem; color: #10b981; display: inline-block; background: rgba(16, 185, 129, 0.12); padding: 0.2rem 0.45rem; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.25); margin-bottom: 0.4rem;">${t.vpsLiveSourceBadge}</span>`
+        : `<span class="mono" style="font-size: 0.65rem; color: var(--secondary); display: inline-block; background: rgba(251, 188, 0, 0.1); padding: 0.2rem 0.45rem; border-radius: 4px; border: 1px solid rgba(251, 188, 0, 0.2); margin-bottom: 0.4rem;">${t.localSandboxSourceBadge}</span>`;
+
+      const botBubble = document.createElement('div');
+      botBubble.className = "chat-bubble-bot";
+      botBubble.innerHTML = `
+        ${sourceBadgeHtml}
+        <div>${botReply}</div>
+        <span class="mono" style="font-size: 0.65rem; color: rgba(255, 255, 255, 0.4); display: block; text-align: right; margin-top: 0.35rem;">
+          ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+        </span>
+      `;
+      chat.appendChild(botBubble);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // Modal 1: Link Generator Controls
+    function openLinkGenModal() {
+      document.getElementById('gen-webhook-input').value = vpsWebhookUrl;
+
+      // Base URL resolution: check localStorage, otherwise if running on localhost default to public domain
+      const savedBaseUrl = localStorage.getItem('vps_public_base_url');
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const defaultBase = savedBaseUrl || (isLocal ? 'https://onboarding.odiretorcriativo.com' : (window.location.origin + window.location.pathname));
+
+      const baseInput = document.getElementById('gen-base-url-input');
+      if (baseInput) {
+        baseInput.value = defaultBase;
+      }
+
+      const warn = document.getElementById('gen-localhost-warning');
+      if (warn) {
+        if (isLocal) {
+          warn.classList.remove('hidden');
+        } else {
+          warn.classList.add('hidden');
+        }
+      }
+
+      updateGeneratedLink();
+      document.getElementById('linkgen-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeLinkGenModal() {
+      document.getElementById('linkgen-modal').classList.add('hidden');
+    }
+
+    function updateGeneratedLink() {
+      const baseInput = document.getElementById('gen-base-url-input');
+      let base = baseInput ? baseInput.value.trim() : '';
+      
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (!base) {
+        base = isLocal ? 'https://onboarding.odiretorcriativo.com' : (window.location.origin + window.location.pathname);
+      }
+
+      if (base.startsWith('http')) {
+        localStorage.setItem('vps_public_base_url', base);
+      }
+
+      const webhook = document.getElementById('gen-webhook-input').value.trim();
+      const clientName = document.getElementById('gen-client-name').value.trim();
+      const lang = document.getElementById('gen-client-lang').value;
+
+      // Clean trailing slash
+      const cleanBase = base.replace(/\/$/, '');
+      const params = new URLSearchParams();
+
+      if (webhook) params.set('webhook', webhook);
+      if (clientName) params.set('client', clientName);
+      if (lang) params.set('lang', lang);
+
+      const queryString = params.toString();
+      const fullUrl = queryString ? `${cleanBase}/?${queryString}` : `${cleanBase}/`;
+      document.getElementById('generated-client-link').value = fullUrl;
+    }
+
+    function copyGeneratedLink() {
+      const linkInput = document.getElementById('generated-client-link');
+      linkInput.select();
+      linkInput.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(linkInput.value);
+
+      const t = I18N[currentLang];
+      const btn = document.getElementById('btn-copy-link');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="check" style="width: 14px; height: 14px;"></i><span>${t.modalLinkgenBtnCopied}</span>`;
+      btn.style.background = "#10b981";
+      lucide.createIcons();
+
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        btn.style.background = "";
+        lucide.createIcons();
+      }, 2000);
+    }
+
+    function testGeneratedLink() {
+      const link = document.getElementById('generated-client-link').value;
+      window.open(link, '_blank');
+    }
+
+    // Modal 2: VPS Guide Controls
+    function openVpsModal() {
+      document.getElementById('input-vps-webhook').value = vpsWebhookUrl;
+      document.getElementById('vps-modal').classList.remove('hidden');
+    }
+
+    function closeVpsModal() {
+      document.getElementById('vps-modal').classList.add('hidden');
+    }
+
+    function saveVpsConfig() {
+      const t = I18N[currentLang];
+      const val = document.getElementById('input-vps-webhook').value.trim();
+      vpsWebhookUrl = val;
+      localStorage.setItem('vps_onboarding_webhook', val);
+      closeVpsModal();
+      alert(val ? t.vpsAlertSaved : t.vpsAlertSandbox);
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.innerText = str;
+      return d.innerHTML;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+    });
+  </script>
+</body>
+</html>

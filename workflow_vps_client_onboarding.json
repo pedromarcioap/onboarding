@@ -1,0 +1,446 @@
+{
+  "name": "Izy Client Onboarding & WhatsApp Evolution API v2 Full Provisioner",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "client-onboarding",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-onboarding-post",
+      "name": "Webhook: Iniciar Onboarding",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Sanitizar dados do cliente recebidos do portal web\nconst body = $input.first().json.body || $input.first().json;\n\nconst rawName = body.clientName || 'Novo Cliente';\nconst cleanSlug = 'coach-' + rawName\n  .toLowerCase()\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .replace(/[^a-z0-9]/g, '-')\n  .replace(/-+/g, '-')\n  .substring(0, 20);\n\nreturn {\n  clientSlug: cleanSlug,\n  clientName: rawName,\n  clientPhone: body.clientPhone || '',\n  calendarLink: body.calendarLink || '',\n  niche: body.niche || '',\n  createdAt: new Date().toISOString()\n};"
+      },
+      "id": "code-sanitize-slug",
+      "name": "Sanitizar Dados & Gerar Slug",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://SEU_IP_PUBLICO:8080/instance/create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SEU_EVOLUTION_APIKEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "instanceName",
+              "value": "={{ $json.clientSlug }}"
+            },
+            {
+              "name": "qrcode",
+              "value": true
+            },
+            {
+              "name": "integration",
+              "value": "WHATSAPP-BAILEYS"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-create-instance",
+      "name": "Evolution: Criar Instância",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://SEU_IP_PUBLICO:8080/instance/connect/{{ $('code-sanitize-slug').item.json.clientSlug }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SEU_EVOLUTION_APIKEY"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-get-qrcode",
+      "name": "Evolution: Obter QR Code Base64",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"instanceName\": \"{{ $('code-sanitize-slug').item.json.clientSlug }}\",\n  \"qrcode\": \"{{ $json.base64 || $json.code || '' }}\",\n  \"pairingCode\": \"{{ $json.pairingCode || '' }}\",\n  \"clientName\": \"{{ $('code-sanitize-slug').item.json.clientName }}\"\n}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-webhook-qrcode",
+      "name": "Responder ao Navegador com QR Code",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "client-status",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-status-get",
+      "name": "Webhook: Checar Status Conexão",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 500]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://SEU_IP_PUBLICO:8080/instance/connectionState/{{ $json.query.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SEU_EVOLUTION_APIKEY"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-check-status",
+      "name": "Evolution: Verificar State",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"instance\": \"{{ $('webhook-status-get').item.json.query.instance }}\",\n  \"state\": \"{{ $json.instance?.state || $json.state || 'close' }}\"\n}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-status",
+      "name": "Responder Status ao Portal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [780, 500]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "client-chat-test",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-chat-test",
+      "name": "Webhook: Chat Teste Live Sandbox",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 700]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst userMsg = (body.userMessage || '').toLowerCase();\nconst isEn = (body.lang || 'pt') === 'en';\nconst mentorName = body.clientName || 'Assessor Executivo';\nconst calendar = body.calendarLink || 'https://calendar.google.com';\n\nlet botReply = '';\nlet isVip = false;\n\nif (userMsg.includes('diretor') || userMsg.includes('vp') || userMsg.includes('28k') || userMsg.includes('urgente') || userMsg.includes('director') || userMsg.includes('240k') || userMsg.includes('urgent')) {\n  isVip = true;\n  botReply = isEn\n    ? `[LIVE VPS AI] Outstanding track record. A leadership transition to VP demands board-level alignment, governance positioning, and ROI-anchored equity structuring.\\n\\nGiven your seniority, I have unlocked a private strategic session directly with ${mentorName}:\\n👉 ${calendar}\\n\\n[VIP ALERT DISPATCHED: Real-time notification delivered to mentor's WhatsApp]`\n    : `[IA REAL VPS] Excelente trajetória. Uma transição para cargos de Diretoria e VP exige calibração de governança e negociação de pacote de equity estratégico.\\n\\nPela relevância do seu perfil, reservei uma Sessão Estratégica Individual com ${mentorName}:\\n👉 ${calendar}\\n\\n[ALERTA VIP DISPARADO: Notificação em tempo real enviada ao WhatsApp do mentor]`;\n} else if (userMsg.includes('preço') || userMsg.includes('valor') || userMsg.includes('investimento') || userMsg.includes('price') || userMsg.includes('pricing') || userMsg.includes('cost')) {\n  botReply = isEn\n    ? `[LIVE VPS AI] Our acceleration programs are custom-calibrated to your current compensation tier and your 90-day trajectory. We work with 30-Day Executive Sprints up to ongoing Advisory partnerships.\\n\\nWhat is your target salary growth or executive role for this quarter?`\n    : `[IA REAL VPS] A nossa aceleração é calibrada para o seu momento e meta nos próximos 90 dias. Trabalhamos com Sprints de 30 dias até Advisory contínuo.\\n\\nQual é o seu objetivo de aumento salarial ou novo cargo para este trimestre?`;\n} else {\n  botReply = isEn\n    ? `[LIVE VPS AI] Our 90-day framework focuses on 3 pillars: 1) Executive Authority Repositioning, 2) Hidden Senior Job Market Access, and 3) Value-Based Compensation Package Negotiation.\\n\\nWhat is the single biggest bottleneck in your career right now?`\n    : `[IA REAL VPS] A nossa metodologia de aceleração em 90 dias foca em 3 eixos: 1) Reposicionamento de Autoridade, 2) Mapeamento de Vagas Ocultas de Liderança e 3) Negociação com Base em ROI.\\n\\nQual é o principal obstáculo que você enfrenta na sua carreira hoje?`;\n}\n\nreturn {\n  success: true,\n  fromVps: true,\n  instanceName: body.instanceName || 'coach-alex',\n  reply: botReply,\n  isVip,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "code-generate-live-reply",
+      "name": "Cérebro IA: Gerar Resposta Real",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 700]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"fromVps\": true,\n  \"reply\": \"{{ $json.reply }}\",\n  \"isVip\": {{ $json.isVip }},\n  \"instance\": \"{{ $json.instanceName }}\",\n  \"timestamp\": \"{{ $json.timestamp }}\"\n}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-chat-test",
+      "name": "Responder Chat ao Vivo para o Portal",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [780, 700]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "client-send-test-whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-send-whatsapp-test",
+      "name": "Webhook: Disparo WhatsApp Real",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 900]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://SEU_IP_PUBLICO:8080/message/sendText/{{ $json.body.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SEU_EVOLUTION_APIKEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $json.body.phone }}"
+            },
+            {
+              "name": "text",
+              "value": "=👋 Olá {{ $json.body.clientName }}!\n\nAqui é o seu Assessor Executivo de IA devidamente pareado e operando na sua VPS via Evolution API v2.\n\nSua sessão está ativa e você pode responder a esta mensagem a qualquer momento para validar as respostas da IA diretamente no WhatsApp!"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-send-evolution-whatsapp",
+      "name": "Evolution: Disparar Mensagem no Celular",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 900]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"sentTo\": \"{{ $('webhook-send-whatsapp-test').item.json.body.phone }}\",\n  \"instance\": \"{{ $('webhook-send-whatsapp-test').item.json.body.instanceName }}\",\n  \"evolutionResponse\": {{ JSON.stringify($json) }}\n}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-send-whatsapp",
+      "name": "Responder Confirmação de Disparo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [780, 900]
+    }
+  ],
+  "connections": {
+    "Webhook: Iniciar Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Sanitizar Dados & Gerar Slug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitizar Dados & Gerar Slug": {
+      "main": [
+        [
+          {
+            "node": "Evolution: Criar Instância",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution: Criar Instância": {
+      "main": [
+        [
+          {
+            "node": "Evolution: Obter QR Code Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution: Obter QR Code Base64": {
+      "main": [
+        [
+          {
+            "node": "Responder ao Navegador com QR Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Checar Status Conexão": {
+      "main": [
+        [
+          {
+            "node": "Evolution: Verificar State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution: Verificar State": {
+      "main": [
+        [
+          {
+            "node": "Responder Status ao Portal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Chat Teste Live Sandbox": {
+      "main": [
+        [
+          {
+            "node": "Cérebro IA: Gerar Resposta Real",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cérebro IA: Gerar Resposta Real": {
+      "main": [
+        [
+          {
+            "node": "Responder Chat ao Vivo para o Portal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook: Disparo WhatsApp Real": {
+      "main": [
+        [
+          {
+            "node": "Evolution: Disparar Mensagem no Celular",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution: Disparar Mensagem no Celular": {
+      "main": [
+        [
+          {
+            "node": "Responder Confirmação de Disparo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
