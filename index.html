@@ -935,13 +935,42 @@
             <p class="form-help" id="t-help-phone">Para onde o robô enviará notificações imediatas quando qualificar um lead de alta renda.</p>
           </div>
 
-          <!-- Calendar URL -->
-          <div class="form-group">
-            <label class="form-label" for="input-client-calendar" id="t-lbl-calendar">
-              Link da sua Agenda (Google Calendar / Cal.com)
-            </label>
-            <input type="url" id="input-client-calendar" required value="" placeholder="" class="form-input" />
-            <p class="form-help" id="t-help-calendar">O robô enviará este link automaticamente no momento exato do fechamento da conversa.</p>
+          <!-- Calendar URL with Verification & Live Preview -->
+          <div class="form-group" style="position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label class="form-label" for="input-client-calendar" id="t-lbl-calendar" style="margin-bottom: 0;">
+                Link da sua Google Agenda (Agendamento de Horários)
+              </label>
+              <button type="button" onclick="testCalendarUrl()" id="btn-test-calendar-url" class="btn-secondary" style="padding: 0.22rem 0.65rem; font-size: 0.72rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; text-transform: none;">
+                <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
+                <span id="t-btn-test-calendar">Testar Abertura</span>
+              </button>
+            </div>
+            
+            <div style="position: relative;">
+              <input 
+                type="url" 
+                id="input-client-calendar" 
+                required 
+                value="" 
+                oninput="handleCalendarInput()" 
+                onblur="handleCalendarBlur()" 
+                placeholder="https://calendar.app.google/..." 
+                class="form-input" 
+                style="padding-right: 2.6rem; transition: border-color 0.2s, box-shadow 0.2s;" 
+              />
+              <div id="calendar-icon-indicator" style="position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); display: flex; align-items: center; pointer-events: none;">
+                <!-- dynamic status icon -->
+              </div>
+            </div>
+
+            <!-- Dynamic Live Feedback Box -->
+            <div id="calendar-feedback-box" class="hidden" style="margin-top: 0.45rem; padding: 0.55rem 0.85rem; border-radius: 6px; font-size: 0.78rem; display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.45; transition: all 0.25s ease;">
+              <span id="calendar-feedback-icon" style="flex-shrink: 0; margin-top: 0.05rem;"></span>
+              <span id="calendar-feedback-text"></span>
+            </div>
+
+            <p class="form-help" id="t-help-calendar">O robô enviará este link automaticamente no momento exato do fechamento da conversa para o lead agendar a sessão.</p>
           </div>
         </div>
 
@@ -1367,9 +1396,21 @@
         defaultPhone: "5511999998888",
         placeholderPhone: "Ex: 5511999998888 (com DDI e DDD)",
         helpPhone: "Para onde o robô enviará notificações imediatas quando qualificar um lead de alta renda.",
-        lblCalendar: "Link da sua Agenda (Google Calendar / Cal.com)",
-        defaultCalendar: "https://calendar.google.com/calendar/u/0/appointments/schedules/SEU_LINK",
-        helpCalendar: "O robô enviará este link automaticamente no momento exato do fechamento da conversa.",
+        lblCalendar: "Link da sua Google Agenda (Agendamento de Horários)",
+        defaultCalendar: "https://calendar.app.google/demoExecutiveSession",
+        placeholderCalendar: "https://calendar.app.google/...",
+        helpCalendar: "O robô enviará este link automaticamente no momento exato do fechamento da conversa para o lead agendar a sessão.",
+        btnTestCalendar: "Testar Abertura",
+        calValidTitle: "Link Válido do Google Agenda",
+        calValidDesc: "Página de agendamento de horários reconhecida com sucesso.",
+        calWarnMeet: "Atenção: Você inseriu um link do Google Meet (chamada de vídeo). O robô precisa do link da sua Google Agenda (Agendamento de Horários) onde o lead escolhe o dia e horário.",
+        calWarnPlaceholder: "Por favor, substitua o link de exemplo pelo link real da sua Google Agenda.",
+        calWarnGenericCal: "Link da Google Agenda detectado. Certifique-se de que é a sua página pública de agendamento de horários (appointments/schedules).",
+        calWarnThirdParty: "Detectado agendamento externo (Calendly/Cal.com). Para Google Agenda oficial, utilize links calendar.app.google ou calendar.google.com.",
+        calErrInvalidUrl: "URL Inválida. Insira um link completo iniciando com https:// (ex: https://calendar.app.google/...)",
+        calErrNotGoogle: "URL não reconhecida. Insira um link válido da sua Google Agenda (ex: https://calendar.app.google/...)",
+        calAlertNeedUrl: "Por favor, digite ou cole o link da sua agenda primeiro.",
+        calSubmitBlocked: "Por favor, forneça um link válido da sua Google Agenda antes de prosseguir.",
         lblNiche: "Foco Principal ou Promessa Central da Mentoria",
         defaultNiche: "Transição de Carreira para Cargos de Diretoria e C-Suite",
         placeholderNiche: "Ex: Transição para VP, aumento salarial executivo, aceleração de carreira",
@@ -1490,9 +1531,21 @@
         defaultPhone: "14155552671",
         placeholderPhone: "E.g. 14155552671 (with Country Code and Area Code)",
         helpPhone: "Where the AI sends immediate notifications upon qualifying high-earning leads.",
-        lblCalendar: "Your Booking Calendar Link (Google Calendar / Cal.com)",
-        defaultCalendar: "https://calendar.google.com/calendar/u/0/appointments/schedules/YOUR_LINK",
-        helpCalendar: "The bot automatically shares this link at the exact moment of closing.",
+        lblCalendar: "Your Google Calendar Link (Appointment Schedules)",
+        defaultCalendar: "https://calendar.app.google/demoExecutiveSession",
+        placeholderCalendar: "https://calendar.app.google/...",
+        helpCalendar: "The advisor will autonomously send this link at the closing moment for the lead to schedule a session.",
+        btnTestCalendar: "Test Calendar Link",
+        calValidTitle: "Valid Google Calendar Link",
+        calValidDesc: "Public appointment schedule recognized successfully.",
+        calWarnMeet: "Warning: You provided a Google Meet (video call) link. The advisor requires your Google Calendar Appointment Schedule link where leads pick a date & time.",
+        calWarnPlaceholder: "Please replace the sample link with your actual live Google Calendar link.",
+        calWarnGenericCal: "Google Calendar link detected. Ensure this is your public appointment schedule page (appointments/schedules).",
+        calWarnThirdParty: "External scheduling detected (Calendly/Cal.com). For official Google Calendar, use a calendar.app.google or calendar.google.com link.",
+        calErrInvalidUrl: "Invalid URL. Please enter a complete URL starting with https:// (e.g. https://calendar.app.google/...)",
+        calErrNotGoogle: "Unrecognized URL. Please provide a valid Google Calendar schedule link (e.g. https://calendar.app.google/...)",
+        calAlertNeedUrl: "Please enter or paste your calendar link first.",
+        calSubmitBlocked: "Please provide a valid Google Calendar schedule link before proceeding.",
         lblNiche: "Core Focus or Primary Promise of your Mentorship",
         defaultNiche: "Career Transition to VP & C-Suite Leadership Roles",
         placeholderNiche: "E.g. Transition to VP, executive compensation increase, fast-track leadership",
@@ -1695,6 +1748,7 @@
       document.getElementById('t-help-phone').innerText = t.helpPhone;
       document.getElementById('t-lbl-calendar').innerText = t.lblCalendar;
       document.getElementById('t-help-calendar').innerText = t.helpCalendar;
+      document.getElementById('t-btn-test-calendar').innerText = t.btnTestCalendar;
       document.getElementById('t-lbl-niche').innerText = t.lblNiche;
       document.getElementById('t-help-niche').innerText = t.helpNiche;
       document.getElementById('t-btn-step1').innerText = t.btnStep1;
@@ -1706,7 +1760,7 @@
 
       inputName.placeholder = t.placeholderName;
       inputPhone.placeholder = t.placeholderPhone;
-      inputCalendar.placeholder = t.defaultCalendar;
+      inputCalendar.placeholder = t.placeholderCalendar || t.defaultCalendar;
       inputNiche.placeholder = t.placeholderNiche;
 
       if (!isClientDedicatedMode) {
@@ -1812,6 +1866,7 @@
 
       document.getElementById('chat-brand-name').innerText = clientConfig.name;
       updateChatGreeting();
+      validateCalendarUrl(false);
       lucide.createIcons();
     }
 
@@ -1837,11 +1892,188 @@
       lucide.createIcons();
     }
 
+    // =========================================================================
+    // Google Calendar Validation & Verification Engine
+    // =========================================================================
+    function sanitizeCalendarUrl(raw) {
+      let val = (raw || '').trim();
+      if (!val) return '';
+      if (!val.startsWith('http://') && !val.startsWith('https://')) {
+        val = 'https://' + val;
+      }
+      return val;
+    }
+
+    function checkCalendarValidity(url) {
+      const t = I18N[currentLang];
+      if (!url) {
+        return { status: 'empty', msg: t.calAlertNeedUrl };
+      }
+
+      let parsed;
+      try {
+        parsed = new URL(url);
+      } catch(e) {
+        return { status: 'error', msg: t.calErrInvalidUrl };
+      }
+
+      const hostname = parsed.hostname.toLowerCase();
+      const path = parsed.pathname.toLowerCase();
+
+      // 1. Placeholder check
+      if (url.includes('SEU_LINK') || url.includes('YOUR_LINK') || url.includes('example.com')) {
+        return { status: 'error', msg: t.calWarnPlaceholder };
+      }
+
+      // 2. Google Meet mistake
+      if (hostname.includes('meet.google.com')) {
+        return { status: 'error', msg: t.calWarnMeet };
+      }
+
+      // 3. Official Google Calendar Appointment Short Links (e.g. calendar.app.google/...)
+      if (hostname === 'calendar.app.google' || hostname.endsWith('.calendar.app.google')) {
+        return { status: 'valid', msg: `${t.calValidTitle} — ${t.calValidDesc}` };
+      }
+
+      // 4. Official Google Calendar (appointments, schedules, embed)
+      if (hostname.includes('calendar.google.com')) {
+        if (path.includes('appointments') || path.includes('schedules')) {
+          return { status: 'valid', msg: `${t.calValidTitle} — ${t.calValidDesc}` };
+        }
+        return { status: 'warning', msg: t.calWarnGenericCal };
+      }
+
+      // 5. Popular booking alternatives (Calendly, Cal.com)
+      if (hostname.includes('calendly.com') || hostname.includes('cal.com')) {
+        return { status: 'warning', msg: t.calWarnThirdParty };
+      }
+
+      // 6. Non-calendar or unrecognizable
+      return { status: 'error', msg: t.calErrNotGoogle };
+    }
+
+    function handleCalendarInput() {
+      validateCalendarUrl(false);
+    }
+
+    function handleCalendarBlur() {
+      const input = document.getElementById('input-client-calendar');
+      if (input.value.trim()) {
+        input.value = sanitizeCalendarUrl(input.value);
+      }
+      validateCalendarUrl(true);
+    }
+
+    function validateCalendarUrl(showEmptyError = false) {
+      const input = document.getElementById('input-client-calendar');
+      if (!input) return;
+
+      const val = input.value.trim();
+      const iconBox = document.getElementById('calendar-icon-indicator');
+      const feedbackBox = document.getElementById('calendar-feedback-box');
+      const feedbackIcon = document.getElementById('calendar-feedback-icon');
+      const feedbackText = document.getElementById('calendar-feedback-text');
+
+      if (!val) {
+        if (showEmptyError) {
+          input.style.borderColor = "#ef4444";
+          input.style.boxShadow = "0 0 0 1px #ef4444";
+          if (iconBox) iconBox.innerHTML = `<i data-lucide="alert-circle" style="width: 16px; height: 16px; color: #ef4444;"></i>`;
+          if (feedbackBox) {
+            feedbackBox.classList.remove('hidden');
+            feedbackBox.style.background = "rgba(239, 68, 68, 0.1)";
+            feedbackBox.style.border = "1px solid rgba(239, 68, 68, 0.3)";
+            feedbackBox.style.color = "#fca5a5";
+            feedbackIcon.innerHTML = `<i data-lucide="alert-circle" style="width: 14px; height: 14px; color: #ef4444;"></i>`;
+            feedbackText.innerText = I18N[currentLang].calAlertNeedUrl;
+          }
+        } else {
+          input.style.borderColor = "";
+          input.style.boxShadow = "";
+          if (iconBox) iconBox.innerHTML = "";
+          if (feedbackBox) feedbackBox.classList.add('hidden');
+        }
+        lucide.createIcons();
+        return;
+      }
+
+      const res = checkCalendarValidity(sanitizeCalendarUrl(val));
+
+      if (res.status === 'valid') {
+        input.style.borderColor = "#10b981";
+        input.style.boxShadow = "0 0 0 1px #10b981";
+        if (iconBox) iconBox.innerHTML = `<i data-lucide="check-circle-2" style="width: 16px; height: 16px; color: #10b981;"></i>`;
+        if (feedbackBox) {
+          feedbackBox.classList.remove('hidden');
+          feedbackBox.style.background = "rgba(16, 185, 129, 0.1)";
+          feedbackBox.style.border = "1px solid rgba(16, 185, 129, 0.3)";
+          feedbackBox.style.color = "#6ee7b7";
+          feedbackIcon.innerHTML = `<i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: #10b981;"></i>`;
+          feedbackText.innerText = res.msg;
+        }
+      } else if (res.status === 'warning') {
+        input.style.borderColor = "var(--secondary)";
+        input.style.boxShadow = "0 0 0 1px var(--secondary)";
+        if (iconBox) iconBox.innerHTML = `<i data-lucide="alert-triangle" style="width: 16px; height: 16px; color: var(--secondary);"></i>`;
+        if (feedbackBox) {
+          feedbackBox.classList.remove('hidden');
+          feedbackBox.style.background = "rgba(251, 188, 0, 0.1)";
+          feedbackBox.style.border = "1px solid rgba(251, 188, 0, 0.3)";
+          feedbackBox.style.color = "var(--secondary)";
+          feedbackIcon.innerHTML = `<i data-lucide="alert-triangle" style="width: 14px; height: 14px; color: var(--secondary);"></i>`;
+          feedbackText.innerText = res.msg;
+        }
+      } else {
+        input.style.borderColor = "#ef4444";
+        input.style.boxShadow = "0 0 0 1px #ef4444";
+        if (iconBox) iconBox.innerHTML = `<i data-lucide="x-circle" style="width: 16px; height: 16px; color: #ef4444;"></i>`;
+        if (feedbackBox) {
+          feedbackBox.classList.remove('hidden');
+          feedbackBox.style.background = "rgba(239, 68, 68, 0.1)";
+          feedbackBox.style.border = "1px solid rgba(239, 68, 68, 0.3)";
+          feedbackBox.style.color = "#fca5a5";
+          feedbackIcon.innerHTML = `<i data-lucide="x-circle" style="width: 14px; height: 14px; color: #ef4444;"></i>`;
+          feedbackText.innerText = res.msg;
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function testCalendarUrl() {
+      const input = document.getElementById('input-client-calendar');
+      const t = I18N[currentLang];
+      let val = input.value.trim();
+      if (!val) {
+        alert(t.calAlertNeedUrl);
+        input.focus();
+        validateCalendarUrl(true);
+        return;
+      }
+      val = sanitizeCalendarUrl(val);
+      input.value = val;
+      validateCalendarUrl(false);
+      window.open(val, '_blank');
+    }
+
     async function handleStep1Submit(e) {
       e.preventDefault();
+
+      // Check and sanitize Google Calendar URL
+      const calInput = document.getElementById('input-client-calendar');
+      const sanitizedCal = sanitizeCalendarUrl(calInput.value);
+      calInput.value = sanitizedCal;
+      
+      const calCheck = checkCalendarValidity(sanitizedCal);
+      if (calCheck.status === 'error' || calCheck.status === 'empty') {
+        validateCalendarUrl(true);
+        calInput.focus();
+        calInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
       clientConfig.name = document.getElementById('input-client-name').value;
       clientConfig.phone = document.getElementById('input-client-phone').value;
-      clientConfig.calendar = document.getElementById('input-client-calendar').value;
+      clientConfig.calendar = sanitizedCal;
       clientConfig.niche = document.getElementById('input-client-niche').value;
 
       document.getElementById('chat-brand-name').innerText = clientConfig.name;
